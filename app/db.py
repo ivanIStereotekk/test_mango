@@ -52,7 +52,7 @@ class Chat(Base):
     __tablename__ = "chat_table"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     users: Mapped[List["User"]] = mapped_column(Integer, ForeignKey("user_table.id"), nullable=True)
-    messages: Mapped[List["Message"]] = mapped_column(Integer, ForeignKey("message_table.id"))
+    messages: Mapped[int] = mapped_column(Integer, ForeignKey("message_table.id"))
     created_at: Mapped[str] = mapped_column(DateTime, nullable=False)
 
     def __repr__(self):
