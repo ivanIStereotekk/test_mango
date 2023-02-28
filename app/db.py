@@ -1,6 +1,6 @@
 from typing import AsyncGenerator
 from sqlalchemy import Integer, Column, String, ForeignKey, Text,Boolean
-from sqlalchemy.orm import DeclarativeBase, relationship, Mapped
+from sqlalchemy.orm import DeclarativeBase, relationship, Mapped,mapped_column
 from typing import List
 
 from fastapi import Depends
@@ -20,32 +20,33 @@ class Base(DeclarativeBase):
 
 
 class User(SQLAlchemyBaseUserTable[int], Base):
-    __tablename__ = 'user'
-    id: Mapped[int] = Column(Integer, primary_key=True)
-    name: Mapped[str] = Column(String(30))
-    surname: Mapped[str] = Column(String)
-    email: Mapped[str] = Column(String, nullable=False)
-    phone_number: Mapped[str] = Column(String, nullable=False)
-    hashed_password: Mapped[str] = Column(String, nullable=False)
-    pictures: Mapped[List["Picture"]] = relationship(back_populates="picture_user_id")
-    is_active: Mapped[bool] = Column(Boolean, nullable=True)
-    is_superuser: Mapped[bool] = Column(Boolean, nullable=True)
-    is_verified: Mapped[bool] = Column(Boolean, nullable=True)
+    __tablename__ = 'user_table'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(30))
+    surname: Mapped[str] = mapped_column(String)
+    email: Mapped[str] = mapped_column(String, nullable=False)
+    phone_number: Mapped[str] = mapped_column(String, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
+    pictures: Mapped[List["Picture"]] = relationship()
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=True, default=True)
+    is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
+    is_verified: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
 
     def __repr__(self):
         return f"User= {self.name} {self.surname} "
 
 
 class Picture(Base):
-    __tablename__ = "picture"
-    id: Mapped[int] = Column(Integer, primary_key=True)
-    user_id: Mapped[int] = Column(Integer, ForeignKey("user.id"), nullable=False)
-    file_50: Mapped[str] = Column(Text)
-    file_100: Mapped[str] = Column(Text)
-    file_400: Mapped[str] = Column(Text)
+    __tablename__ = "picture_table"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user_table.id"), nullable=False)
+    file_50: Mapped[str] = mapped_column(Text)
+    file_100: Mapped[str] = mapped_column(Text)
+    file_400: Mapped[str] = mapped_column(Text)
+    original: Mapped[str] = mapped_column(Text)
 
     def __repr__(self):
-        return f"Picture={self.id}, user={self.user_id})"
+        return f"Picture_id={self.id}, user={self.user_id})"
 
 
 engine = create_async_engine(DATABASE_URL)

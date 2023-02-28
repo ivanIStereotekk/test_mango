@@ -17,4 +17,3 @@ PG_DB_NAME = config["POSTGRES_DB_NAME"]
 # Authentication secret key
 AUTH_SECRET_KEY = config["AUTH_SECRET_KEY"]
 
-print(config.values())
