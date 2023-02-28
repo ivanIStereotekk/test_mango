@@ -1,9 +1,12 @@
 from typing import AsyncGenerator
+from sqlalchemy import Integer, Column, String, ForeignKey, Text,Boolean
+from sqlalchemy.orm import DeclarativeBase, relationship, Mapped
+from typing import List
 
 from fastapi import Depends
-from fastapi_users.db import SQLAlchemyBaseUserTableUUID, SQLAlchemyUserDatabase
+from fastapi_users.db import SQLAlchemyUserDatabase
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase
 from settings import PG_HOST, PG_PORT, PG_USER, PG_PASS, PG_DB_NAME
 
 
@@ -16,8 +19,33 @@ class Base(DeclarativeBase):
     pass
 
 
-class User(SQLAlchemyBaseUserTableUUID, Base):
-    pass
+class User(SQLAlchemyBaseUserTable[int], Base):
+    __tablename__ = 'user'
+    id: Mapped[int] = Column(Integer, primary_key=True)
+    name: Mapped[str] = Column(String(30))
+    surname: Mapped[str] = Column(String)
+    email: Mapped[str] = Column(String, nullable=False)
+    phone_number: Mapped[str] = Column(String, nullable=False)
+    hashed_password: Mapped[str] = Column(String, nullable=False)
+    pictures: Mapped[List["Picture"]] = relationship(back_populates="picture_user_id")
+    is_active: Mapped[bool] = Column(Boolean, nullable=True)
+    is_superuser: Mapped[bool] = Column(Boolean, nullable=True)
+    is_verified: Mapped[bool] = Column(Boolean, nullable=True)
+
+    def __repr__(self):
+        return f"User= {self.name} {self.surname} "
+
+
+class Picture(Base):
+    __tablename__ = "picture"
+    id: Mapped[int] = Column(Integer, primary_key=True)
+    user_id: Mapped[int] = Column(Integer, ForeignKey("user.id"), nullable=False)
+    file_50: Mapped[str] = Column(Text)
+    file_100: Mapped[str] = Column(Text)
+    file_400: Mapped[str] = Column(Text)
+
+    def __repr__(self):
+        return f"Picture={self.id}, user={self.user_id})"
 
 
 engine = create_async_engine(DATABASE_URL)
@@ -36,3 +64,6 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, User)
+
+async def get_picture_db(session: AsyncSession = Depends(get_async_session)):
+    yield SQLAlchemyUserDatabase(session, Picture)
