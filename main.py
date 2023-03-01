@@ -66,16 +66,19 @@ async def authenticated_route(user: User = Depends(current_active_user)):
 async def authenticated_route(user: User = Depends(current_active_user)):
     return {"message": f"Hello {user.email} you have {user.phone_number}!"}
 
-@app.post("/drop_all/", tags=["For development usage only - DROP ALL TABLES DB"])
-async def drop_route(drop_all: str):
-    if drop_all == 'drop_all':
-        drop_db_and_tables()
+@app.post("/drop_all/", tags=["For development usage only - DROP ALL / CREATE ALL TABLES DB"])
+async def drop_route(command: str):
+    if command == 'drop_all':
+        await drop_db_and_tables()
         return {"Message": "Database and tables dropped"}
+    if command == 'create_all':
+        await create_db_and_tables()
+        return {"Message": "Database and new tables migrated"}
 
 
-@app.on_event("startup")
-async def on_startup():
-    await create_db_and_tables()
+# @app.on_event("startup")
+# async def on_startup():
+#     await create_db_and_tables()
 
 
 if __name__ == "__main__":
