@@ -1,5 +1,5 @@
 from typing import AsyncGenerator
-from sqlalchemy import Integer, Column, String, ForeignKey, Text,Boolean, DateTime
+from sqlalchemy import Integer, String, ForeignKey, Text,Boolean, DateTime
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped,mapped_column
 from typing import List, Optional
 
@@ -20,6 +20,9 @@ class Base(DeclarativeBase):
 
 
 class User(SQLAlchemyBaseUserTable[int], Base):
+    """
+    User table with obvious and visible fields and options.
+    """
     __tablename__ = 'user_table'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(30))
@@ -37,6 +40,9 @@ class User(SQLAlchemyBaseUserTable[int], Base):
 
 
 class Picture(Base):
+    """
+    Picture model wih a foreign key reference to a User model and picture saving options.
+    """
     __tablename__ = "picture_table"
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=False)
@@ -48,6 +54,10 @@ class Picture(Base):
     def __repr__(self):
         return f"Picture_id={self.id}, user={self.user_id})"
 class Reaction(Base):
+    """
+    Reaction model - which shows user who reacted to a picture or chat message.
+    Type field should contain the type of the reaction like "like" or "dislike".
+    """
     __tablename__ = "reaction_table"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user: Mapped[int] = mapped_column(ForeignKey("user_table.id"))
@@ -55,15 +65,21 @@ class Reaction(Base):
     def __repr__(self):
         return f"Reaction_id={self.id}, user={self.user}, type={self.type}"
 class Message(Base):
+    """
+    Message Table which contains text messages related to the chat and of course users who participating in the chat
+    """
     __tablename__ = "message_table"
     id: Mapped[int] = mapped_column(primary_key=True)
     author: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=False)
     body: Mapped[str] = mapped_column(Text)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
-    reactions: Mapped[List["Reaction"]] = mapped_column(ForeignKey("reaction_table.type"), nullable=True)
+    reactions: Mapped[List["Reaction"]] = mapped_column(ForeignKey("reaction_table.id"), nullable=True)
     def __repr__(self):
         return f"Message_id={self.id}, author={self.author}, created_at={self.created_at})"
 class Chat(Base):
+    """
+    Chat or dialogue which contains messages and users who are participating in the conversation
+    """
     __tablename__ = "chat_table"
     id: Mapped[int] = mapped_column(primary_key=True)
     users: Mapped[List["User"]] = mapped_column(ForeignKey("user_table.id"), nullable=True)
