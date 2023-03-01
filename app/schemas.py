@@ -14,9 +14,9 @@ class UserRead(schemas.BaseUser[int]):
     is_active: bool
     is_superuser: bool
     is_verified: bool
-    user_reactions: List[str]
-    user_in_chats: List[str]
-    user_messages: List[str]
+    # user_reactions: List[str]
+    # user_in_chats: List[str]
+    # user_messages: List[str]
 
 
 
@@ -69,7 +69,7 @@ class MessageSchema(BaseModel):
     created_at: datetime
     reactions_ids: List[int] = []
     reactions: List[ReactionSchema]
-    author: UserRead
+    # author: UserRead
 
 
 class ChatSchema(BaseModel):
@@ -78,7 +78,7 @@ class ChatSchema(BaseModel):
     message_ids: List[int]
     created_at: datetime
     text_messages: List[MessageSchema]
-    participants: List[UserRead]
+    # participants: List[UserRead]
 
 
 

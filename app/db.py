@@ -2,6 +2,7 @@ from typing import AsyncGenerator
 from sqlalchemy import Integer, String, ForeignKey, Text,Boolean, DateTime
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped,mapped_column
 from typing import List, Optional
+from sqlalchemy.util import greenlet_spawn, await_only
 
 from fastapi import Depends
 from fastapi_users.db import SQLAlchemyUserDatabase
@@ -34,12 +35,13 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=True, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
-    user_reactions: Mapped[List["Reaction"]] = relationship(back_populates="user")
-    user_in_chats: Mapped[List["Chat"]] = relationship(back_populates="username")
-    user_messages: Mapped[List["Message"]] = relationship(back_populates="author")
+    # user_reactions: Mapped[List["Reaction"]] = relationship(back_populates="user")
+    # user_in_chats: Mapped[List["Chat"]] = relationship(back_populates="users")
+    # user_messages: Mapped[List["Message"]] = relationship(back_populates="author")
 
     def __repr__(self):
         return f"User= {self.name} {self.surname} "
+
 
 
 class Picture(Base):
@@ -65,10 +67,10 @@ class Reaction(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"))
     type: Mapped[str] = mapped_column(String, nullable=True)
-    user: Mapped["User"] = relationship(back_populates="user_reactions")
+    # user: Mapped["User"] = relationship(back_populates="user_reactions")
     reacted_message: Mapped["Message"] = relationship(back_populates="reactions")
     def __repr__(self):
-        return f"Reaction_id={self.id}, user={self.user}, type={self.type}"
+        return f"Reaction_id={self.id}, user={self.user_id}, type={self.type}"
 class Message(Base):
     """
     Message Table which contains text messages related to the chat and of course users who participating in the chat
@@ -80,9 +82,9 @@ class Message(Base):
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
     reaction_ids: Mapped[List["Reaction"]] = mapped_column(ForeignKey("reaction_table.id"), nullable=True)
     reactions: Mapped[List["Reaction"]] = relationship(back_populates="reacted_message")
-    author: Mapped["User"] = relationship(back_populates="user_messages")
+    # author: Mapped["User"] = relationship(back_populates="user_messages")
     def __repr__(self):
-        return f"Message_id={self.id}, author={self.author}, created_at={self.created_at})"
+        return f"Message_id={self.id}, author={self.author_id}, created_at={self.created_at})"
 class Chat(Base):
     """
     Chat or dialogue which contains messages and users who are participating in the conversation
@@ -93,7 +95,8 @@ class Chat(Base):
     messages_ids: Mapped[List["Message"]] = mapped_column(ForeignKey("message_table.id"), nullable=True)
     created_at: Mapped[str] = mapped_column(DateTime, nullable=False)
     text_messages: Mapped[List["Message"]] = relationship()
-    participants: Mapped[List["User"]] = relationship(back_populates="user_in_chats")
+    # participants: Mapped[List["User"]] = relationship(back_populates="user_in_chats")
+    # users: Mapped[List["User"]] = relationship(back_populates="user_in_chats")
 
     def __repr__(self):
         return f"Chat_id={self.id}, users={self.user_ids}, created_at={self.created_at})"
@@ -108,7 +111,7 @@ class Chat(Base):
 
 engine = create_async_engine(DATABASE_URL,echo=True)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
-
+Session = engine.begin()
 
 async def create_db_and_tables():
     async with engine.begin() as conn:
@@ -117,6 +120,7 @@ async def create_db_and_tables():
 async def drop_db_and_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
@@ -125,5 +129,5 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, User)
 
-async def get_picture_db(session: AsyncSession = Depends(get_async_session)):
-    yield SQLAlchemyUserDatabase(session, Picture)
+
+
