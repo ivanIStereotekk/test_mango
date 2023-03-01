@@ -1,7 +1,8 @@
 import uuid
 from pydantic import validator, Field
+from pydantic.types import constr
 from fastapi_users import schemas
-
+import re
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
     name: str
@@ -16,17 +17,12 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
 class UserCreate(schemas.BaseUserCreate):
     name: str
     surname: str
-    phone_number: str
+    phone_number: constr(strip_whitespace=True, min_length=8, max_length=15, regex="^\\+?[1-9][0-9]{7,14}$")
     is_active: bool = Field(default=True)
     is_superuser: bool = Field(default=False)
     is_verified: bool = Field(default=False)
 
 
-    @validator('phone_number')
-    def phone_must_contain_plus(cls, v):
-        if '+7' not in v and len(v) < 10:
-            raise ValueError('Phone number should start with + 7 and contain more than 10 digits')
-        return v.title()
 
 
 class UserUpdate(schemas.BaseUserUpdate):
