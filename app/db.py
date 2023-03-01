@@ -34,6 +34,9 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=True, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
+    user_reactions: Mapped[List["Reaction"]] = relationship(back_populates="user")
+    user_in_chats: Mapped[List["Chat"]] = relationship(back_populates="username")
+    user_messages: Mapped[List["Message"]] = relationship(back_populates="author")
 
     def __repr__(self):
         return f"User= {self.name} {self.surname} "
@@ -60,8 +63,10 @@ class Reaction(Base):
     """
     __tablename__ = "reaction_table"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user: Mapped[int] = mapped_column(ForeignKey("user_table.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"))
     type: Mapped[str] = mapped_column(String, nullable=True)
+    user: Mapped["User"] = relationship(back_populates="user_reactions")
+    reacted_message: Mapped["Message"] = relationship(back_populates="reactions")
     def __repr__(self):
         return f"Reaction_id={self.id}, user={self.user}, type={self.type}"
 class Message(Base):
@@ -70,10 +75,12 @@ class Message(Base):
     """
     __tablename__ = "message_table"
     id: Mapped[int] = mapped_column(primary_key=True)
-    author: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=False)
+    author_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=False)
     body: Mapped[str] = mapped_column(Text)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
-    reactions: Mapped[List["Reaction"]] = mapped_column(ForeignKey("reaction_table.id"), nullable=True)
+    reaction_ids: Mapped[List["Reaction"]] = mapped_column(ForeignKey("reaction_table.id"), nullable=True)
+    reactions: Mapped[List["Reaction"]] = relationship(back_populates="reacted_message")
+    author: Mapped["User"] = relationship(back_populates="user_messages")
     def __repr__(self):
         return f"Message_id={self.id}, author={self.author}, created_at={self.created_at})"
 class Chat(Base):
@@ -82,12 +89,14 @@ class Chat(Base):
     """
     __tablename__ = "chat_table"
     id: Mapped[int] = mapped_column(primary_key=True)
-    users: Mapped[List["User"]] = mapped_column(ForeignKey("user_table.id"), nullable=True)
-    messages: Mapped[List["Message"]] = mapped_column(ForeignKey("message_table.id"), nullable=True)
+    user_ids: Mapped[List["User"]] = mapped_column(ForeignKey("user_table.id"), nullable=True)
+    messages_ids: Mapped[List["Message"]] = mapped_column(ForeignKey("message_table.id"), nullable=True)
     created_at: Mapped[str] = mapped_column(DateTime, nullable=False)
+    text_messages: Mapped[List["Message"]] = relationship()
+    participants: Mapped[List["User"]] = relationship(back_populates="user_in_chats")
 
     def __repr__(self):
-        return f"Chat_id={self.id}, users={self.users}, created_at={self.created_at})"
+        return f"Chat_id={self.id}, users={self.user_ids}, created_at={self.created_at})"
 
 
 
@@ -97,7 +106,7 @@ class Chat(Base):
 
 
 
-engine = create_async_engine(DATABASE_URL)
+engine = create_async_engine(DATABASE_URL,echo=True)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 

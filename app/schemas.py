@@ -1,16 +1,22 @@
 import uuid
-from pydantic import validator, Field
+from pydantic import validator, Field, BaseModel
 from pydantic.types import constr
 from fastapi_users import schemas
+from typing import List
+from datetime import datetime
 
+# USER schemas
 
-class UserRead(schemas.BaseUser[uuid.UUID]):
+class UserRead(schemas.BaseUser[int]):
     name: str
     surname: str
     phone_number: str
     is_active: bool
     is_superuser: bool
     is_verified: bool
+    user_reactions: List[str]
+    user_in_chats: List[str]
+    user_messages: List[str]
 
 
 
@@ -34,25 +40,49 @@ class UserUpdate(schemas.BaseUserUpdate):
     is_verified: bool = Field(default=False)
 
 
-# ivan = {
-#   "email": "ivan.stereotekk@gmail.com",
-#   "password": "qwertyuiop123",
-#   "is_active": True,
-#   "is_superuser": False,
-#   "is_verified": False,
-#   "name": "Ivan",
-#   "surname": "Goncharov",
-#   "phone_number": "+79855203082"
-# }
-#
-# john = {
-#   "email": "john@gmail.com",
-#   "password": "jonnydebth123",
-#   "is_active": true,
-#   "is_superuser": false,
-#   "is_verified": false,
-#   "name": "Johan",
-#   "surname": "Debth",
-#   "phone_number": "888898888"
-#
-# }
+
+# Other Schemas
+
+class PictureSchema(BaseModel):
+    user_id: int
+    file_50: str
+    file_100: str
+    file_400: str
+    original: str
+
+class ReactionSchema(BaseModel):
+    id: int
+    user_id: int
+    type: str
+    user: str
+    reacted_message: str
+
+
+
+
+
+
+class MessageSchema(BaseModel):
+    id: int
+    author_id: int
+    body: str
+    created_at: datetime
+    reactions_ids: List[int] = []
+    reactions: List[ReactionSchema]
+    author: UserRead
+
+
+class ChatSchema(BaseModel):
+    id: int
+    user_ids: List[int]
+    message_ids: List[int]
+    created_at: datetime
+    text_messages: List[MessageSchema]
+    participants: List[UserRead]
+
+
+
+
+
+
+
