@@ -2,7 +2,7 @@ import uuid
 from pydantic import validator, Field
 from pydantic.types import constr
 from fastapi_users import schemas
-import re
+
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
     name: str
@@ -34,25 +34,25 @@ class UserUpdate(schemas.BaseUserUpdate):
     is_verified: bool = Field(default=False)
 
 
-ivan = {
-  "email": "ivan.stereotekk@gmail.com",
-  "password": "qwertyuiop123",
-  "is_active": True,
-  "is_superuser": False,
-  "is_verified": False,
-  "name": "Ivan",
-  "surname": "Goncharov",
-  "phone_number": "+79855203082"
-}
-
-john = {
-  "email": "john@gmail.com",
-  "password": "jonnydebth123",
-  "is_active": True,
-  "is_superuser": False,
-  "is_verified": False,
-  "name": "Johan",
-  "surname": "Debth",
-  "phone_number": "888898888"
-
-}
+# ivan = {
+#   "email": "ivan.stereotekk@gmail.com",
+#   "password": "qwertyuiop123",
+#   "is_active": True,
+#   "is_superuser": False,
+#   "is_verified": False,
+#   "name": "Ivan",
+#   "surname": "Goncharov",
+#   "phone_number": "+79855203082"
+# }
+#
+# john = {
+#   "email": "john@gmail.com",
+#   "password": "jonnydebth123",
+#   "is_active": true,
+#   "is_superuser": false,
+#   "is_verified": false,
+#   "name": "Johan",
+#   "surname": "Debth",
+#   "phone_number": "888898888"
+#
+# }
