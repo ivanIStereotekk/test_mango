@@ -20,3 +20,7 @@ AUTH_SECRET_KEY = config["AUTH_SECRET_KEY"]
 # Hidden mail address
 MAIL_ADDRESS = config["MAIL_ADDRESS"]
 
+# Telemetry and logging
+SENTRY_DSN = config["SENTRY_DSN"]
+SENTRY_TRACES_SAMPLE_RATE = config["SENTRY_TRACES_SAMPLE_RATE"]
+
