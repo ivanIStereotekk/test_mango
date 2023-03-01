@@ -1,11 +1,13 @@
 import uvicorn
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, APIRouter
 
 from app.db import User, create_db_and_tables
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
 
 app = FastAPI(title="Messanger Mango Project", version="0.1.0")
+
+# AUTHENTICATION ROUTERS
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["Authentication Token Methods"]
@@ -31,16 +33,30 @@ app.include_router(
     tags=["User Retrieve Methods"],
 )
 
+# OTHER ROUTERS AND ENDPOINTS
 
-@app.get("/authenticated-route",tags=["Authenticated Route GET PICTURES"])
+router = APIRouter(
+    prefix="/pictures",
+    tags=["Pictures Endpoints"],
+    dependencies=[Depends(current_active_user)],
+    responses={404: {"description": "Not found"}},
+)
+
+
+@router.get("/user/<user_id>", tags=["Authenticated User Method GET PICTURES"])
 async def authenticated_route(user: User = Depends(current_active_user)):
-    return {"message": f"Hello {user.email}!"}
+    return {"pictures": f"Hello {user.phone_number}!"}
+
+
+# Test Endpoint For Authenticated Users
+@app.get("/authenticated-route", tags=["Authenticated Route GET PICTURES"])
+async def authenticated_route(user: User = Depends(current_active_user)):
+    return {"message": f"Hello {user.email} you have {user.phone_number}!"}
 
 
 @app.on_event("startup")
 async def on_startup():
     await create_db_and_tables()
-
 
 
 if __name__ == "__main__":
