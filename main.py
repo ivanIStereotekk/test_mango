@@ -66,7 +66,7 @@ current_user = fastapi_users.current_user(active=True)
 @app.post("/add_picture", tags=["TEST Endpoint POST"],
           response_model=PictureResponse,
           status_code=status.HTTP_201_CREATED)
-async def add_pictures(user: User = Depends(current_user)
+async def add_picture(user: User = Depends(current_user)
                        , session: AsyncSession = Depends(get_async_session)
                        , picture: PictureCreate = Depends()):
     """
