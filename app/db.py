@@ -1,8 +1,7 @@
 from typing import AsyncGenerator
-from sqlalchemy import Integer, String, ForeignKey, Text,Boolean, DateTime
-from sqlalchemy.orm import DeclarativeBase, relationship, Mapped,mapped_column
-from typing import List, Optional
-from sqlalchemy.util import greenlet_spawn, await_only
+from sqlalchemy import Integer, String, ForeignKey, Text, Boolean, DateTime
+from sqlalchemy.orm import DeclarativeBase, relationship, Mapped, mapped_column
+from typing import List
 
 from fastapi import Depends
 from fastapi_users.db import SQLAlchemyUserDatabase
@@ -10,10 +9,21 @@ from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from settings import PG_HOST, PG_PORT, PG_USER, PG_PASS, PG_DB_NAME
 
-
 # SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg2://{username}:{password}@{host}:{port}/{db_name}"
 
 DATABASE_URL = f"postgresql+asyncpg://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/{PG_DB_NAME}"
+
+import sentry_sdk
+from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
+
+# Logging and Tracing With Sentry
+sentry_sdk.init(
+    dsn=SENTRY_DSN,
+    traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
+    instrumenter=None,
+)
+
+
 
 
 class Base(DeclarativeBase):
@@ -40,7 +50,6 @@ class User(SQLAlchemyBaseUserTable[int], Base):
         return f"User= {self.name} {self.surname} "
 
 
-
 class Picture(Base):
     """
     Picture model wih a foreign key reference to a User model and picture saving options.
@@ -53,8 +62,11 @@ class Picture(Base):
     file_400: Mapped[str] = mapped_column(Text)
     original: Mapped[str] = mapped_column(Text)
 
+
     def __repr__(self):
         return f"Picture_id={self.id}, user={self.user_id})"
+
+
 class Reaction(Base):
     """
     Reaction model - which shows user who reacted to a picture or chat message.
@@ -65,8 +77,11 @@ class Reaction(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"))
     type: Mapped[str] = mapped_column(String, nullable=True)
     reacted_message: Mapped["Message"] = relationship(back_populates="reactions")
+
     def __repr__(self):
         return f"Reaction_id={self.id}, user={self.user_id}, type={self.type}"
+
+
 class Message(Base):
     """
     Message Table which contains text messages related to the chat and of course users who participating in the chat
@@ -78,8 +93,11 @@ class Message(Base):
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
     reaction_ids: Mapped[List["Reaction"]] = mapped_column(ForeignKey("reaction_table.id"), nullable=True)
     reactions: Mapped[List["Reaction"]] = relationship(back_populates="reacted_message")
+
     def __repr__(self):
         return f"Message_id={self.id}, author={self.author_id}, created_at={self.created_at})"
+
+
 class Chat(Base):
     """
     Chat or dialogue which contains messages and users who are participating in the conversation
@@ -97,24 +115,27 @@ class Chat(Base):
 
 
 
-
-#author: Mapped[int] = mapped_column(ForeignKey("user_table.id"))
-
-
-
-engine = create_async_engine(DATABASE_URL,echo=True)
+engine = create_async_engine(DATABASE_URL, echo=True)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
-Session = engine.begin()
+
+
 
 async def create_db_and_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
+
 async def drop_db_and_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
+
+# Async Session
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    """
+    BASIC GET DATABASE CALLBACK
+    :returns: or yields session !
+    """
     async with async_session_maker() as session:
         yield session
 

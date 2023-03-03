@@ -1,13 +1,19 @@
+from typing import List, Any
+
 import uvicorn
-from fastapi import Depends, FastAPI, APIRouter
-from app.db import User, create_db_and_tables,drop_db_and_tables
+from fastapi import Depends, FastAPI, APIRouter, HTTPException
+from starlette import status
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.schemas import PictureCreate, PictureResponse
+from sqlalchemy import select
+
+from app.db import User, create_db_and_tables, drop_db_and_tables, Picture
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
 from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
 import sentry_sdk
-
-
-
+from app.db import get_async_session
 
 # Logging and Tracing With Sentry
 sentry_sdk.init(
@@ -15,8 +21,6 @@ sentry_sdk.init(
     traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
     instrumenter=None,
 )
-
-
 
 app = FastAPI(title="Messanger Mango Project", version="0.1.0")
 
@@ -55,16 +59,60 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-
-@router.get("/user/<user_id>", tags=["Authenticated User Method GET PICTURES"])
-async def authenticated_route(user: User = Depends(current_active_user)):
-    return {"pictures": f"Hello {user.phone_number}!"}
+current_user = fastapi_users.current_user(active=True)
 
 
-# Test Endpoint For Authenticated Users
-@app.get("/authenticated-route", tags=["Authenticated Route GET PICTURES"])
-async def authenticated_route(user: User = Depends(current_active_user)):
-    return {"message": f"Hello {user.email} you have {user.phone_number}!"}
+################ >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> STOPED HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+@app.post("/add_picture", tags=["TEST Endpoint POST"],
+          response_model=PictureResponse,
+          status_code=status.HTTP_201_CREATED)
+async def add_pictures(user: User = Depends(current_user)
+                       , session: AsyncSession = Depends(get_async_session)
+                       , picture: PictureCreate = Depends()):
+    """
+    TEST Endpoint POST - i gonna redo these methods
+    :param user:
+    :param session:
+    :param picture:
+    :return:
+    """
+    try:
+        new_picture = Picture(user_id=user.id,
+                              file_50=picture.file_50,
+                              file_100=picture.file_100,
+                              file_400=picture.file_400,
+                              original=picture.original
+                              )
+        session.add(new_picture)
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    await session.commit()
+    return {"pictures": [
+        PictureCreate.from_orm(new_picture)
+    ]}
+
+
+@app.get("/get_pictures", tags=["TEST Endpoint GET"],
+         # response_model=PictureResponse,
+         status_code=status.HTTP_200_OK)
+async def get_pictures(user: User = Depends(current_user),
+                       session: AsyncSession = Depends(get_async_session)):
+    """
+    TEST - GET ALL PICTURES by user_id ... TEMPORARY EDITION
+    :param user:
+    :param session:
+    :return:
+    """
+    try:
+        statement = select(Picture).where(Picture.user_id == user.id)
+        results = await session.execute(statement)
+        instance = results.scalars().all()
+        return instance
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+
 
 @app.post("/drop_all/", tags=["For development usage only - DROP ALL / CREATE ALL TABLES DB"])
 async def drop_route(command: str):
@@ -74,6 +122,11 @@ async def drop_route(command: str):
     if command == 'create_all':
         await create_db_and_tables()
         return {"Message": "Database and new tables migrated"}
+
+
+@app.get("/current_user", tags=["Get Current user Method"])
+def get_current_user(user: User = Depends(current_user)):
+    return f"Hello, {user.id} email ={user.email} phone={user.phone_number}"
 
 
 # @app.on_event("startup")

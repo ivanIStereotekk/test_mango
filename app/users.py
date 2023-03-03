@@ -8,7 +8,9 @@ from fastapi_users.db import SQLAlchemyUserDatabase
 
 from app.db import User, get_user_db
 from settings import AUTH_SECRET_KEY
+
 SECRET = AUTH_SECRET_KEY
+
 
 # USER MANAGER - which works with FastAPIUsers
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
@@ -19,12 +21,12 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         print(f"User {user.id} has registered.")
 
     async def on_after_forgot_password(
-        self, user: User, token: str, request: Optional[Request] = None
+            self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"User {user.id} has forgot their password. Reset token: {token}")
 
     async def on_after_request_verify(
-        self, user: User, token: str, request: Optional[Request] = None
+            self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
 

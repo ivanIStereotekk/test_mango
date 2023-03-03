@@ -5,6 +5,7 @@ from fastapi_users import schemas
 from typing import List
 from datetime import datetime
 
+
 # USER schemas
 
 class UserRead(schemas.BaseUser[int]):
@@ -16,7 +17,6 @@ class UserRead(schemas.BaseUser[int]):
     is_verified: bool
 
 
-
 class UserCreate(schemas.BaseUserCreate):
     name: str
     surname: str
@@ -24,8 +24,6 @@ class UserCreate(schemas.BaseUserCreate):
     is_active: bool = Field(default=True)
     is_superuser: bool = Field(default=False)
     is_verified: bool = Field(default=False)
-
-
 
 
 class UserUpdate(schemas.BaseUserUpdate):
@@ -37,15 +35,25 @@ class UserUpdate(schemas.BaseUserUpdate):
     is_verified: bool = Field(default=False)
 
 
-
 # Other Schemas
 
-class PictureSchema(BaseModel):
-    user_id: int
+class PictureCreate(BaseModel):
+    user_id: int = None
     file_50: str
     file_100: str
     file_400: str
     original: str
+
+    class Config:
+        orm_mode = True
+
+
+class PictureResponse(BaseModel):
+    pictures: list[PictureCreate]
+
+    class Config:
+        orm_mode = True
+
 
 class ReactionSchema(BaseModel):
     id: int
@@ -53,10 +61,6 @@ class ReactionSchema(BaseModel):
     type: str
     user: str
     reacted_message: str
-
-
-
-
 
 
 class MessageSchema(BaseModel):
@@ -74,10 +78,3 @@ class ChatSchema(BaseModel):
     message_ids: List[int]
     created_at: datetime
     text_messages: List[MessageSchema]
-
-
-
-
-
-
-
