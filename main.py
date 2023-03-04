@@ -50,27 +50,22 @@ app.include_router(
     tags=["User Retrieve Methods"],
 )
 
-# OTHER ROUTERS AND ENDPOINTS
 
-router = APIRouter(
-    prefix="/pictures",
-    tags=["Pictures Endpoints"],
-    dependencies=[Depends(current_active_user)],
-    responses={404: {"description": "Not found"}},
-)
+
+# OTHER ROUTERS AND ENDPOINTS
 
 current_user = fastapi_users.current_user(active=True)
 
 
 ################ >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> STOPED HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-@router.post("/add", tags=["TEST Endpoint POST"],
+@app.post("/pics/add", tags=["Post Picture"],
           response_model=PictureResponse,
           status_code=status.HTTP_201_CREATED)
-async def add_picture(user: User = Depends(current_user)
-                       , session: AsyncSession = Depends(get_async_session)
-                       , picture: PictureCreate = Depends()):
+async def add_picture(user: User = Depends(current_user),
+                       session: AsyncSession = Depends(get_async_session),
+                       picture: PictureCreate = Depends()):
     """
-    TEST Endpoint POST - i gonna redo these methods
+    Method to add a new picture to the database.
     :param user:
     :param session:
     :param picture:
@@ -92,13 +87,13 @@ async def add_picture(user: User = Depends(current_user)
     ]}
 
 
-@router.get("/get", tags=["TEST Endpoint GET"],
-         # response_model=PictureResponse,
+@app.get("/pics/get", tags=["Get Picture"],
+         response_model=PictureResponse,
          status_code=status.HTTP_200_OK)
 async def get_pictures(user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session)):
     """
-    TEST - GET ALL PICTURES by user_id ... TEMPORARY EDITION
+    Method to get all pictures from the database.
     :param user:
     :param session:
     :return:
@@ -106,8 +101,10 @@ async def get_pictures(user: User = Depends(current_user),
     try:
         statement = select(Picture).where(Picture.user_id == user.id)
         results = await session.execute(statement)
-        instance = results.scalars().all()
-        return instance
+        instances = results.scalars().all()
+        return {"pictures": [
+            PictureCreate.from_orm(instances)
+        ]}
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
