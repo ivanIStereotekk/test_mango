@@ -14,7 +14,7 @@ from app.users import auth_backend, current_active_user, fastapi_users
 from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
 import sentry_sdk
 from app.db import get_async_session
-
+from app.src.pictures import router
 # Logging and Tracing With Sentry
 sentry_sdk.init(
     dsn=SENTRY_DSN,
@@ -49,66 +49,12 @@ app.include_router(
     prefix="/users",
     tags=["User Retrieve Methods"],
 )
-
-
+# Pictures Router
+app.include_router(router, prefix="/pictures", tags=["Pictures API"])
 
 # OTHER ROUTERS AND ENDPOINTS
 
 current_user = fastapi_users.current_user(active=True)
-
-
-################ >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> STOPED HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-@app.post("/pics/add", tags=["Post Picture"],
-          response_model=PictureResponse,
-          status_code=status.HTTP_201_CREATED)
-async def add_picture(user: User = Depends(current_user),
-                       session: AsyncSession = Depends(get_async_session),
-                       picture: PictureCreate = Depends()):
-    """
-    Method to add a new picture to the database.
-    :param user:
-    :param session:
-    :param picture:
-    :return:
-    """
-    try:
-        new_picture = Picture(user_id=user.id,
-                              file_50=picture.file_50,
-                              file_100=picture.file_100,
-                              file_400=picture.file_400,
-                              original=picture.original
-                              )
-        session.add(new_picture)
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    await session.commit()
-    return {"pictures": [
-        PictureCreate.from_orm(new_picture)
-    ]}
-
-
-@app.get("/pics/get", tags=["Get Picture"],
-         response_model=PictureResponse,
-         status_code=status.HTTP_200_OK)
-async def get_pictures(user: User = Depends(current_user),
-                       session: AsyncSession = Depends(get_async_session)):
-    """
-    Method to get all pictures from the database.
-    :param user:
-    :param session:
-    :return:
-    """
-    try:
-        statement = select(Picture).where(Picture.user_id == user.id)
-        results = await session.execute(statement)
-        instances = results.scalars().all()
-        return {"pictures": [
-            PictureCreate.from_orm(instances)
-        ]}
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
 
 
 @app.post("/drop_all/", tags=["For development usage only - DROP ALL / CREATE ALL TABLES DB"])
