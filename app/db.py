@@ -2,7 +2,6 @@ from typing import AsyncGenerator
 from sqlalchemy import Integer, String, ForeignKey, Text, Boolean, DateTime
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped, mapped_column
 from typing import List
-
 from fastapi import Depends
 from fastapi_users.db import SQLAlchemyUserDatabase
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
@@ -133,7 +132,7 @@ async def drop_db_and_tables():
 # Async Session
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     """
-    BASIC GET DATABASE CALLBACK
+    BASIC GET_DATABASE CALLBACK
     :returns: or yields session !
     """
     async with async_session_maker() as session:
