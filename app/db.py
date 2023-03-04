@@ -13,15 +13,15 @@ from settings import PG_HOST, PG_PORT, PG_USER, PG_PASS, PG_DB_NAME
 
 DATABASE_URL = f"postgresql+asyncpg://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/{PG_DB_NAME}"
 
-import sentry_sdk
-from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
-
-# Logging and Tracing With Sentry
-sentry_sdk.init(
-    dsn=SENTRY_DSN,
-    traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
-    instrumenter=None,
-)
+# import sentry_sdk
+# from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
+#
+# # Logging and Tracing With Sentry
+# sentry_sdk.init(
+#     dsn=SENTRY_DSN,
+#     traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
+#     instrumenter=None,
+# )
 
 
 
