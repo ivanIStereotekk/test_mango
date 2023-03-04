@@ -14,8 +14,13 @@ from app.users import auth_backend, current_active_user, fastapi_users
 from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
 import sentry_sdk
 from app.db import get_async_session
-from app.src.pictures import router
-# Logging and Tracing With Sentry
+# R O U T E R S
+from app.src.pictures import router as pictures_router
+from app.src.chat import router as chat_router
+from app.src.reaction import router as reaction_router
+from app.src.message import router as message_router
+
+# S E N T R Y - Tracing
 sentry_sdk.init(
     dsn=SENTRY_DSN,
     traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
@@ -49,8 +54,12 @@ app.include_router(
     prefix="/users",
     tags=["User Retrieve Methods"],
 )
-# Pictures Router
-app.include_router(router, prefix="/pictures", tags=["Pictures API"])
+# D B  Entity's Routers
+app.include_router(pictures_router, prefix="/pictures", tags=["Pictures API"])
+app.include_router(chat_router, prefix="/dialogs", tags=["Dialog/Chat API"])
+app.include_router(reaction_router, prefix="/reactions", tags=["Reaction API"])
+app.include_router(message_router, prefix="/private", tags=["Private Message API"])
+
 
 # OTHER ROUTERS AND ENDPOINTS
 
