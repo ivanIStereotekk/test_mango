@@ -63,7 +63,7 @@ current_user = fastapi_users.current_user(active=True)
 
 
 ################ >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> STOPED HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-@app.post("/add_picture", tags=["TEST Endpoint POST"],
+@router.post("/add", tags=["TEST Endpoint POST"],
           response_model=PictureResponse,
           status_code=status.HTTP_201_CREATED)
 async def add_picture(user: User = Depends(current_user)
@@ -92,7 +92,7 @@ async def add_picture(user: User = Depends(current_user)
     ]}
 
 
-@app.get("/get_pictures", tags=["TEST Endpoint GET"],
+@router.get("/get", tags=["TEST Endpoint GET"],
          # response_model=PictureResponse,
          status_code=status.HTTP_200_OK)
 async def get_pictures(user: User = Depends(current_user),
