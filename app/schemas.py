@@ -2,7 +2,7 @@ import uuid
 from pydantic import validator, Field, BaseModel
 from pydantic.types import constr
 from fastapi_users import schemas
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 
@@ -56,25 +56,40 @@ class PictureResponse(BaseModel):
 
 
 class ReactionSchema(BaseModel):
-    id: int
-    user_id: int
+    id: int = None
+    user_id: int = None
     type: str
     user: str
     reacted_message: str
 
 
-class MessageSchema(BaseModel):
+# Response schema
+
+
+class MessageCreate(BaseModel):
+    id: int = None
+    author_id: int = None
+    body: str
+    created_at: Optional[datetime]
+    class Config:
+        orm_mode = True
+class MessageRespInner(BaseModel):
     id: int
     author_id: int
     body: str
-    created_at: datetime
-    reactions_ids: List[int] = []
-    reactions: List[ReactionSchema]
-
+    created_at: Optional[datetime]
+    reaction_ids: list
+    reactions: list
+    class Config:
+        orm_mode = True
+class MessageResponse(BaseModel):
+    messages: list[MessageCreate]
+    class Config:
+        orm_mode = True
 
 class ChatSchema(BaseModel):
     id: int
-    user_ids: List[int]
-    message_ids: List[int]
+    user_ids: list[int]
+    message_ids: list[int]
     created_at: datetime
-    text_messages: List[MessageSchema]
+    text_messages: list[MessageResponse]

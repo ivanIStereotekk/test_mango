@@ -3,9 +3,9 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-
-from app.db import User, get_async_session, Picture
-from app.schemas import PictureResponse, PictureCreate
+from datetime import datetime
+from app.db import User, get_async_session, Picture, Message
+from app.schemas import PictureResponse, PictureCreate, MessageResponse, MessageCreate
 from app.users import fastapi_users
 
 current_user = fastapi_users.current_user(active=True)
@@ -15,54 +15,34 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-
 @router.post("/add",
-             response_model=PictureResponse,
+             response_model=MessageResponse,response_model_exclude_unset=True,
              status_code=status.HTTP_201_CREATED)
-async def add_picture(user: User = Depends(current_user),
+async def add_message(user: User = Depends(current_user),
                       session: AsyncSession = Depends(get_async_session),
-                      picture: PictureCreate = Depends()):
-    """
-    Method to add a new picture to the database.
-    :param user:
-    :param session:
-    :param picture:
-    :return:
-    """
+                      message: MessageCreate = Depends()):
     try:
-        new_picture = Picture(user_id=user.id,
-                              file_50=picture.file_50,
-                              file_100=picture.file_100,
-                              file_400=picture.file_400,
-                              original=picture.original
+        new_message = Message(author_id=user.id,
+                              body=message.body,
+                              created_at=str(datetime.now()),
                               )
-        session.add(new_picture)
+        session.add(new_message)
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))
     await session.commit()
-    return {"pictures": [
-        PictureCreate.from_orm(new_picture)
-    ]}
+    return {"messages": [new_message]}
 
 
 @router.get("/get",
-            response_model=PictureResponse,
+            response_model=MessageResponse,
             status_code=status.HTTP_200_OK)
-async def get_pictures(user: User = Depends(current_user),
+async def get_messages(user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session)):
-    """
-    Method to get all pictures from the database.
-    :param user:
-    :param session:
-    :return:
-    """
     try:
-        statement = select(Picture).where(Picture.user_id == user.id)
+        statement = select(Message).where(Message.author_id == user.id)
         results = await session.execute(statement)
         instances = results.scalars().all()
-        return {"pictures": instances}
-
-
+        return {"messages": instances}
 
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))
