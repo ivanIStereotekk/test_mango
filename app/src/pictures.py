@@ -12,11 +12,9 @@ from app.users import fastapi_users
 current_user = fastapi_users.current_user(active=True)
 
 router = APIRouter(
-    # dependencies=[Depends(current_user)],
+    dependencies=[Depends(current_user)],
     responses={404: {"description": "Not found"}},
 )
-
-
 @router.post("/add",
              response_model=PictureResponse,
              status_code=status.HTTP_201_CREATED)
@@ -24,7 +22,7 @@ async def add_picture(user: User = Depends(current_user),
                       session: AsyncSession = Depends(get_async_session),
                       picture: PictureCreate = Depends()):
     """
-    Method to add a new picture to the database.
+    Method to add a new message to the database.
     :param user:
     :param session:
     :param picture:
@@ -52,7 +50,7 @@ async def add_picture(user: User = Depends(current_user),
 async def get_pictures(user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session)):
     """
-    Method to get all pictures from the database.
+    Method to get all messages from the database.
     :param user:
     :param session:
     :return:
@@ -62,8 +60,6 @@ async def get_pictures(user: User = Depends(current_user),
         results = await session.execute(statement)
         instances = results.scalars().all()
         return {"pictures": instances}
-
-
 
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))

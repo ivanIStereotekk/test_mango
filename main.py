@@ -55,10 +55,10 @@ app.include_router(
     tags=["User Retrieve Methods"],
 )
 # D B  Entity's Routers
-app.include_router(pictures_router, prefix="/pictures", tags=["Pictures API"])
-app.include_router(chat_router, prefix="/dialogs", tags=["Dialog/Chat API"])
-app.include_router(reaction_router, prefix="/reactions", tags=["Reaction API"])
-app.include_router(message_router, prefix="/private", tags=["Private Message API"])
+app.include_router(pictures_router, prefix="/pictures", tags=["User Pictures API"])
+app.include_router(chat_router, prefix="/dialogs", tags=["Dialog/User Chat API"])
+app.include_router(reaction_router, prefix="/reactions", tags=["User Reaction API"])
+app.include_router(message_router, prefix="/private", tags=["User's Private Message API"])
 
 
 # OTHER ROUTERS AND ENDPOINTS

@@ -36,6 +36,7 @@ class UserUpdate(schemas.BaseUserUpdate):
 
 
 # Other Schemas
+#    ================================================================= Picture
 
 class PictureCreate(BaseModel):
     user_id: int = None
@@ -55,38 +56,44 @@ class PictureResponse(BaseModel):
         orm_mode = True
 
 
-class ReactionSchema(BaseModel):
+#    ================================================================= Reaction
+class ReactionCreate(BaseModel):
     id: int = None
-    user_id: int = None
+    user_id: Optional[int] = None
     type: str
-    user: str
-    reacted_message: str
+    reacted_message: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+
+class ReactionResponse(BaseModel):
+    reactions: ReactionCreate
+
+    class Config:
+        orm_mode = True
 
 
 # Response schema
-
-
+#    ================================================================= Message
 class MessageCreate(BaseModel):
     id: int = None
     author_id: int = None
     body: str
     created_at: Optional[datetime]
-    class Config:
-        orm_mode = True
-class MessageRespInner(BaseModel):
-    id: int
-    author_id: int
-    body: str
-    created_at: Optional[datetime]
-    reaction_ids: list
-    reactions: list
-    class Config:
-        orm_mode = True
-class MessageResponse(BaseModel):
-    messages: list[MessageCreate]
+
     class Config:
         orm_mode = True
 
+
+class MessageResponse(BaseModel):
+    messages: list[MessageCreate]
+
+    class Config:
+        orm_mode = True
+
+
+#    ================================================================= Chat
 class ChatSchema(BaseModel):
     id: int
     user_ids: list[int]

@@ -4,8 +4,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from app.db import User, get_async_session, Picture
-from app.schemas import PictureResponse, PictureCreate
+from app.db import User, get_async_session, Reaction
+from app.schemas import ReactionCreate, ReactionResponse
 from app.users import fastapi_users
 
 current_user = fastapi_users.current_user(active=True)
@@ -17,52 +17,47 @@ router = APIRouter(
 
 
 @router.post("/add",
-             response_model=PictureResponse,
+             response_model=ReactionResponse,
              status_code=status.HTTP_201_CREATED)
-async def add_picture(user: User = Depends(current_user),
-                      session: AsyncSession = Depends(get_async_session),
-                      picture: PictureCreate = Depends()):
+async def add_reaction(user: User = Depends(current_user),
+                       session: AsyncSession = Depends(get_async_session),
+                       reaction: ReactionCreate = Depends()):
     """
     Method to add a new picture to the database.
+    :param reaction:
     :param user:
     :param session:
     :param picture:
     :return:
     """
     try:
-        new_picture = Picture(user_id=user.id,
-                              file_50=picture.file_50,
-                              file_100=picture.file_100,
-                              file_400=picture.file_400,
-                              original=picture.original
-                              )
-        session.add(new_picture)
+        new_reaction = Reaction(user_id=user.id,
+                                type=reaction.type,
+                                reacted_message=reaction.reacted_message),
+
+        session.add(new_reaction)
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))
     await session.commit()
-    return {"pictures": [
-        PictureCreate.from_orm(new_picture)
-    ]}
+    return {"reactions": new_reaction}
 
 
 @router.get("/get",
-            response_model=PictureResponse,
+            response_model=ReactionResponse,
             status_code=status.HTTP_200_OK)
-async def get_pictures(user: User = Depends(current_user),
-                       session: AsyncSession = Depends(get_async_session)):
+async def get_reactions(user: User = Depends(current_user),
+                        session: AsyncSession = Depends(get_async_session)):
     """
     Method to get all pictures from the database.
     :param user:
     :param session:
-    :return:
+    :return: Reactions
     """
     try:
-        statement = select(Picture).where(Picture.user_id == user.id)
+        statement = select(Reaction).where(Reaction.user_id == user.id)
         results = await session.execute(statement)
         instances = results.scalars().all()
         return {"pictures": instances}
-
-
 
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))

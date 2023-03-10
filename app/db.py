@@ -75,7 +75,7 @@ class Reaction(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"),nullable=True)
     type: Mapped[str] = mapped_column(String, nullable=True)
-    reacted_message: Mapped[Optional["Message"]]= relationship(back_populates="reactions")
+    reacted_message: Mapped[int] = mapped_column(ForeignKey("message_table.id"),nullable=True,)
 
     def __repr__(self):
         return f"Reaction_id={self.id}, user={self.user_id}, type={self.type}"
@@ -90,8 +90,7 @@ class Message(Base):
     author_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=True)
     body: Mapped[str] = mapped_column(Text)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
-    reaction_ids: Mapped[Optional["Reaction"]] = mapped_column(ForeignKey("reaction_table.id"), nullable=True)
-    reactions: Mapped[Optional["Reaction"]] = relationship(back_populates="reacted_message")
+    reactions: Mapped[Optional["Reaction"]] = relationship()
 
     def __repr__(self):
         return f"Message_id={self.id}, author={self.author_id}, created_at={self.created_at})"
