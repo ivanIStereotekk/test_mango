@@ -2,8 +2,10 @@ import uuid
 from pydantic import validator, Field, BaseModel
 from pydantic.types import constr
 from fastapi_users import schemas
-from typing import List, Optional
+from typing import List, Optional, Dict
 from datetime import datetime
+
+from sqlalchemy import null
 
 
 # USER schemas
@@ -94,9 +96,20 @@ class MessageResponse(BaseModel):
 
 
 #    ================================================================= Chat
-class ChatSchema(BaseModel):
+
+
+# id: Mapped[int] = mapped_column(primary_key=True)
+# messages: Mapped[List[Message]] = relationship(secondary=message_association_table, lazy='joined')
+# created_at: Mapped[str] = mapped_column(DateTime, nullable=False)
+# participants: Mapped[List[User]] = relationship(secondary=chat_association_table, lazy='joined')
+
+class ChatCreate(BaseModel):
+    participants: Optional[List[int]]
+    created_at: Optional[datetime] = None
+class ChatResponse(BaseModel):
     id: int
-    user_ids: list[int]
-    message_ids: list[int]
     created_at: datetime
-    text_messages: list[MessageResponse]
+    messages: List[MessageResponse]
+    participants: List[UserRead]
+    class Config:
+        orm_mode = True

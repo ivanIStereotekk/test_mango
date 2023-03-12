@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List, Any, Optional
 
 import uvicorn
 from fastapi import Depends, FastAPI, APIRouter, HTTPException
@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas import PictureCreate, PictureResponse
 from sqlalchemy import select
 
-from app.db import User, create_db_and_tables, drop_db_and_tables, Picture
+from app.db import User, create_db_and_tables, drop_db_and_tables, Picture, drop_table
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
 from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
@@ -68,12 +68,16 @@ current_user = fastapi_users.current_user(active=True)
 
 @app.post("/drop_all/", tags=["For development usage only - DROP ALL / CREATE ALL TABLES DB"])
 async def drop_route(command: str):
-    if command == 'drop_all':
-        await drop_db_and_tables()
-        return {"Message": "Database and tables dropped"}
-    if command == 'create_all':
-        await create_db_and_tables()
-        return {"Message": "Database and new tables migrated"}
+    match command:
+        case "drop_all":
+            await drop_db_and_tables()
+            return {"Message": "Database and tables dropped"}
+        case "create_all":
+            await create_db_and_tables()
+            return {"Message": "Database and new tables migrated"}
+        case _:
+            await drop_table(table_name=command)
+            return {"Message": "You are right man! No need anymore this useless table...!"}
 
 
 @app.get("/current_user", tags=["Get Current user Method"])

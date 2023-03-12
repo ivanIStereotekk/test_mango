@@ -1,5 +1,5 @@
 from typing import AsyncGenerator, Optional
-from sqlalchemy import Integer, String, ForeignKey, Text, Boolean, DateTime
+from sqlalchemy import Integer, String, ForeignKey, Text, Boolean, DateTime, Table, Column
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped, mapped_column
 from typing import List
 from fastapi import Depends
@@ -12,6 +12,7 @@ from settings import PG_HOST, PG_PORT, PG_USER, PG_PASS, PG_DB_NAME
 
 DATABASE_URL = f"postgresql+asyncpg://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/{PG_DB_NAME}"
 
+
 # import sentry_sdk
 # from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
 #
@@ -21,8 +22,6 @@ DATABASE_URL = f"postgresql+asyncpg://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/{P
 #     traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
 #     instrumenter=None,
 # )
-
-
 
 
 class Base(DeclarativeBase):
@@ -61,7 +60,6 @@ class Picture(Base):
     file_400: Mapped[str] = mapped_column(Text)
     original: Mapped[str] = mapped_column(Text)
 
-
     def __repr__(self):
         return f"Picture_id={self.id}, user={self.user_id})"
 
@@ -73,9 +71,9 @@ class Reaction(Base):
     """
     __tablename__ = "reaction_table"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"),nullable=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=True)
     type: Mapped[str] = mapped_column(String, nullable=True)
-    reacted_message: Mapped[int] = mapped_column(ForeignKey("message_table.id"),nullable=True,)
+    reacted_message: Mapped[int] = mapped_column(ForeignKey("message_table.id"), nullable=True, )
 
     def __repr__(self):
         return f"Reaction_id={self.id}, user={self.user_id}, type={self.type}"
@@ -90,10 +88,25 @@ class Message(Base):
     author_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=True)
     body: Mapped[str] = mapped_column(Text)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
-    reactions: Mapped[Optional["Reaction"]] = relationship()
+    reactions: Mapped[Optional["Reaction"]] = relationship(lazy='joined')
 
     def __repr__(self):
         return f"Message_id={self.id}, author={self.author_id}, created_at={self.created_at})"
+
+
+chat_association_table = Table(
+    "chat_association_table",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("user_table.id"), primary_key=True),
+    Column("chat_id", Integer, ForeignKey("chat_table.id"), primary_key=True),
+)
+
+message_association_table = Table(
+    "message_association_table",
+    Base.metadata,
+    Column("message_id", Integer, ForeignKey("message_table.id"), primary_key=True),
+    Column("chat_id", Integer, ForeignKey("chat_table.id"), primary_key=True)
+)
 
 
 class Chat(Base):
@@ -102,20 +115,16 @@ class Chat(Base):
     """
     __tablename__ = "chat_table"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_ids: Mapped[List["User"]] = mapped_column(ForeignKey("user_table.id"), nullable=True)
-    messages_ids: Mapped[List["Message"]] = mapped_column(ForeignKey("message_table.id"), nullable=True)
+    messages: Mapped[List[Message]] = relationship(secondary=message_association_table, lazy='joined')
     created_at: Mapped[str] = mapped_column(DateTime, nullable=False)
-    text_messages: Mapped[List["Message"]] = relationship()
+    participants: Mapped[List[User]] = relationship(secondary=chat_association_table, lazy='joined')
 
     def __repr__(self):
-        return f"Chat_id={self.id}, users={self.user_ids}, created_at={self.created_at})"
-
-
+        return f"Chat_id={self.id}, users={self.participants}, created_at={self.created_at})"
 
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
-
 
 
 async def create_db_and_tables():
@@ -126,6 +135,12 @@ async def create_db_and_tables():
 async def drop_db_and_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+
+
+async def drop_table(table_name):
+    async with engine.begin() as conn:
+        statement = f"DROP TABLE {table_name}"
+        await conn.execute(statement)
 
 
 # Async Session
@@ -140,6 +155,3 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, User)
-
-
-
