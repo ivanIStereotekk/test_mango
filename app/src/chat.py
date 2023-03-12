@@ -49,7 +49,7 @@ async def add_chat(user: User = Depends(current_user),
                                 )
                 session.add(new_chat)
                 created_chat = new_chat
-    except Exception as e:
+    except SQLAlchemyError as e:
         raise HTTPException(status_code=404, detail=str(e))
     await session.commit()
     if created_chat:
