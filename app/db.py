@@ -13,20 +13,19 @@ from settings import PG_HOST, PG_PORT, PG_USER, PG_PASS, PG_DB_NAME
 DATABASE_URL = f"postgresql+asyncpg://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/{PG_DB_NAME}"
 
 
-# import sentry_sdk
-# from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
-#
-# # Logging and Tracing With Sentry
-# sentry_sdk.init(
-#     dsn=SENTRY_DSN,
-#     traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
-#     instrumenter=None,
-# )
+
 
 
 class Base(DeclarativeBase):
     pass
 
+# Association Table
+chat_association_table = Table(
+    "chat_association_table",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("user_table.id"), primary_key=True),
+    Column("chat_id", Integer, ForeignKey("chat_table.id"), primary_key=True),
+)
 
 class User(SQLAlchemyBaseUserTable[int], Base):
     """
@@ -39,10 +38,11 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     email: Mapped[str] = mapped_column(String, nullable=False)
     phone_number: Mapped[str] = mapped_column(String, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String, nullable=False)
-    pictures: Mapped[List["Picture"]] = relationship()
+    pictures: Mapped["Picture"] = relationship(backref='user',uselist=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=True, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
+    chats: Mapped[List["Chat"]] = relationship(secondary=chat_association_table,back_populates='participants',lazy=True)
 
     def __repr__(self):
         return f"User= {self.name} {self.surname} "
@@ -59,6 +59,7 @@ class Picture(Base):
     file_100: Mapped[str] = mapped_column(Text)
     file_400: Mapped[str] = mapped_column(Text)
     original: Mapped[str] = mapped_column(Text)
+    # Picture.user - backref
 
     def __repr__(self):
         return f"Picture_id={self.id}, user={self.user_id})"
@@ -88,26 +89,11 @@ class Message(Base):
     author_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=True)
     body: Mapped[str] = mapped_column(Text)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
-    reactions: Mapped[Optional["Reaction"]] = relationship(lazy='joined')
+    reactions: Mapped[List["Reaction"]] = relationship(backref='message',lazy=True)
+    # in_chat - back reference to the chat
 
     def __repr__(self):
         return f"Message_id={self.id}, author={self.author_id}, created_at={self.created_at})"
-
-
-chat_association_table = Table(
-    "chat_association_table",
-    Base.metadata,
-    Column("user_id", Integer, ForeignKey("user_table.id"), primary_key=True),
-    Column("chat_id", Integer, ForeignKey("chat_table.id"), primary_key=True),
-)
-
-message_association_table = Table(
-    "message_association_table",
-    Base.metadata,
-    Column("message_id", Integer, ForeignKey("message_table.id"), primary_key=True),
-    Column("chat_id", Integer, ForeignKey("chat_table.id"), primary_key=True)
-)
-
 
 class Chat(Base):
     """
@@ -115,9 +101,10 @@ class Chat(Base):
     """
     __tablename__ = "chat_table"
     id: Mapped[int] = mapped_column(primary_key=True)
-    messages: Mapped[List[Message]] = relationship(secondary=message_association_table, lazy='joined')
+    messages: Mapped[List[Message]] = relationship(backref='in_chat', lazy='joined')
     created_at: Mapped[str] = mapped_column(DateTime, nullable=False)
-    participants: Mapped[List[User]] = relationship(secondary=chat_association_table, lazy='joined')
+    participants: Mapped[List[User]] = relationship(
+        back_populates='chats',secondary=chat_association_table,lazy=True)
 
     def __repr__(self):
         return f"Chat_id={self.id}, users={self.participants}, created_at={self.created_at})"
@@ -139,7 +126,7 @@ async def drop_db_and_tables():
 
 async def drop_table(table_name):
     async with engine.begin() as conn:
-        statement = f"DROP TABLE {table_name}"
+        statement = f"DROP DB {table_name}"
         await conn.execute(statement)
 
 

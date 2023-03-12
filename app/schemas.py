@@ -97,19 +97,18 @@ class MessageResponse(BaseModel):
 
 #    ================================================================= Chat
 
-
-# id: Mapped[int] = mapped_column(primary_key=True)
-# messages: Mapped[List[Message]] = relationship(secondary=message_association_table, lazy='joined')
-# created_at: Mapped[str] = mapped_column(DateTime, nullable=False)
-# participants: Mapped[List[User]] = relationship(secondary=chat_association_table, lazy='joined')
-
 class ChatCreate(BaseModel):
     participants: Optional[List[int]]
-    created_at: Optional[datetime] = None
-class ChatResponse(BaseModel):
+
+
+class ChatNewResponse(BaseModel):
     id: int
     created_at: datetime
-    messages: List[MessageResponse]
-    participants: List[UserRead]
+    participants: list[UserRead]
+
     class Config:
         orm_mode = True
+
+
+class ChatMessagesResponse(BaseModel):
+    messages: list
