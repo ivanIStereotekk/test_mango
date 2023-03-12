@@ -19,6 +19,7 @@ class UserRead(schemas.BaseUser[int]):
     is_verified: bool
 
 
+
 class UserCreate(schemas.BaseUserCreate):
     name: str
     surname: str

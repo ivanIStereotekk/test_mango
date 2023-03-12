@@ -34,21 +34,28 @@ async def add_chat(user: User = Depends(current_user),
     results = await session.execute(statement)
     instances = results.scalars().all()
     """
+    created_chat = None
     try:
         participants = []
         for one_id in chat.participants:
             statement = select(User).where(User.id == one_id)
             results = await session.execute(statement)
             participant = results.scalars().first()
-            participants.append(participant)
-        new_chat = Chat(participants=participants,
-                        created_at=datetime.now(),
-                        )
-        session.add(new_chat)
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+            if participant:
+                participants.append(participant)
+            if len(participants) >= 2:
+                new_chat = Chat(participants=participants,
+                                created_at=datetime.now(),
+                                )
+                session.add(new_chat)
+                created_chat = new_chat
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
     await session.commit()
-    return ChatNewResponse.from_orm(new_chat)
+    if created_chat:
+        return ChatNewResponse.from_orm(created_chat)
+    else:
+        raise HTTPException(status_code=404, detail=str("Could not create"))
 
 
 # Checker for no repeat chat.

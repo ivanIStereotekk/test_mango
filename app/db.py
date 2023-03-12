@@ -90,6 +90,7 @@ class Message(Base):
     body: Mapped[str] = mapped_column(Text)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
     reactions: Mapped[List["Reaction"]] = relationship(backref='message',lazy=True)
+    chat_id: Mapped[int] = mapped_column(ForeignKey("chat_table.id"))
     # in_chat - back reference to the chat
 
     def __repr__(self):
@@ -126,7 +127,7 @@ async def drop_db_and_tables():
 
 async def drop_table(table_name):
     async with engine.begin() as conn:
-        statement = f"DROP DB {table_name}"
+        statement = f"DROP TABLE {table_name}"
         await conn.execute(statement)
 
 
