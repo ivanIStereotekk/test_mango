@@ -17,7 +17,7 @@ router = APIRouter(
 
 
 @router.post("/add",
-             # response_model=ReactionResponse,
+             response_model=ReactionResponse,
              status_code=status.HTTP_201_CREATED)
 async def add_reaction(user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session),
