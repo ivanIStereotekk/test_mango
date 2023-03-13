@@ -25,6 +25,7 @@ async def add_message(user: User = Depends(current_user),
         new_message = Message(author_id=user.id,
                               body=message.body,
                               created_at=str(datetime.now()),
+                              chat_id=message.chat_id
                               )
         session.add(new_message)
     except SQLAlchemyError as e:
@@ -36,10 +37,25 @@ async def add_message(user: User = Depends(current_user),
 @router.get("/get",
             response_model=MessageResponse,
             status_code=status.HTTP_200_OK)
-async def get_messages(user: User = Depends(current_user),
+async def get_current_user_messages(user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session)):
     try:
         statement = select(Message).where(Message.author_id == user.id)
+        results = await session.execute(statement)
+        instances = results.scalars().all()
+        return {"messages": instances}
+
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/get/{chat_id}",
+            response_model=MessageResponse,
+            status_code=status.HTTP_200_OK)
+async def get_messages_by_id(chat_id: int,user: User = Depends(current_user),
+                       session: AsyncSession = Depends(get_async_session)):
+    try:
+        statement = select(Message).where(Message.chat_id == chat_id)
         results = await session.execute(statement)
         instances = results.scalars().all()
         return {"messages": instances}

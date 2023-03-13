@@ -84,6 +84,7 @@ class MessageCreate(BaseModel):
     author_id: int = None
     body: str
     created_at: Optional[datetime]
+    chat_id: int
 
     class Config:
         orm_mode = True
@@ -98,18 +99,4 @@ class MessageResponse(BaseModel):
 
 #    ================================================================= Chat
 
-class ChatCreate(BaseModel):
-    participants: Optional[List[int]]
 
-
-class ChatNewResponse(BaseModel):
-    id: int
-    created_at: datetime
-    participants: list[UserRead]
-
-    class Config:
-        orm_mode = True
-
-
-class ChatMessagesResponse(BaseModel):
-    messages: list

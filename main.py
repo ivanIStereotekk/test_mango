@@ -16,7 +16,6 @@ import sentry_sdk
 from app.db import get_async_session
 # R O U T E R S
 from app.src.pictures import router as pictures_router
-from app.src.chat import router as chat_router
 from app.src.reaction import router as reaction_router
 from app.src.message import router as message_router
 
@@ -56,7 +55,6 @@ app.include_router(
 )
 # D B  Entity's Routers
 app.include_router(pictures_router, prefix="/pictures", tags=["User Pictures API"])
-app.include_router(chat_router, prefix="/dialogs", tags=["Dialog/User Chat API"])
 app.include_router(reaction_router, prefix="/reactions", tags=["User Reaction API"])
 app.include_router(message_router, prefix="/private", tags=["User's Private Message API"])
 

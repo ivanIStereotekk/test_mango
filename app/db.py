@@ -20,12 +20,6 @@ class Base(DeclarativeBase):
     pass
 
 # Association Table
-chat_association_table = Table(
-    "chat_association_table",
-    Base.metadata,
-    Column("user_id", Integer, ForeignKey("user_table.id"), primary_key=True),
-    Column("chat_id", Integer, ForeignKey("chat_table.id"), primary_key=True),
-)
 
 class User(SQLAlchemyBaseUserTable[int], Base):
     """
@@ -42,7 +36,6 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=True, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
-    chats: Mapped[List["Chat"]] = relationship(secondary=chat_association_table,back_populates='participants',lazy=True)
 
     def __repr__(self):
         return f"User= {self.name} {self.surname} "
@@ -90,25 +83,11 @@ class Message(Base):
     body: Mapped[str] = mapped_column(Text)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
     reactions: Mapped[List["Reaction"]] = relationship(backref='message',lazy=True)
-    chat_id: Mapped[int] = mapped_column(ForeignKey("chat_table.id"))
-    # in_chat - back reference to the chat
-
+    chat_id: Mapped[int] = mapped_column(Integer,default=None)
     def __repr__(self):
-        return f"Message_id={self.id}, author={self.author_id}, created_at={self.created_at})"
+        return f"Message_id={self.id}, author={self.author_id}, created_at={self.chat_id}"
 
-class Chat(Base):
-    """
-    Chat or dialogue which contains messages and users who are participating in the conversation
-    """
-    __tablename__ = "chat_table"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    messages: Mapped[List[Message]] = relationship(backref='in_chat', lazy='joined')
-    created_at: Mapped[str] = mapped_column(DateTime, nullable=False)
-    participants: Mapped[List[User]] = relationship(
-        back_populates='chats',secondary=chat_association_table,lazy=True)
 
-    def __repr__(self):
-        return f"Chat_id={self.id}, users={self.participants}, created_at={self.created_at})"
 
 
 engine = create_async_engine(DATABASE_URL, echo=True)
