@@ -1,11 +1,8 @@
-import uuid
-from pydantic import validator, Field, BaseModel
+from pydantic import Field, BaseModel
 from pydantic.types import constr
 from fastapi_users import schemas
-from typing import List, Optional, Dict
+from typing import Optional
 from datetime import datetime
-
-from sqlalchemy import null
 
 
 # USER schemas
@@ -17,7 +14,6 @@ class UserRead(schemas.BaseUser[int]):
     is_active: bool
     is_superuser: bool
     is_verified: bool
-
 
 
 class UserCreate(schemas.BaseUserCreate):
@@ -62,16 +58,27 @@ class PictureResponse(BaseModel):
 #    ================================================================= Reaction
 class ReactionCreate(BaseModel):
     id: int = None
-    user_id: Optional[int] = None
+    user_id: int = None
     type: str
-    reacted_message: Optional[int] = None
+    message_id: int | None = None
+
+    class Config:
+        orm_mode = True
+
+
+class ReactionInner(BaseModel):
+    id: int
+    user_id: int
+    type: str
+    message_id: int
+    reactions: list
 
     class Config:
         orm_mode = True
 
 
 class ReactionResponse(BaseModel):
-    reactions: ReactionCreate
+    reactions: ReactionInner
 
     class Config:
         orm_mode = True
@@ -95,8 +102,3 @@ class MessageResponse(BaseModel):
 
     class Config:
         orm_mode = True
-
-
-#    ================================================================= Chat
-
-

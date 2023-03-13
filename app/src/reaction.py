@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from app.db import User, get_async_session, Reaction
+from app.db import User, get_async_session, Reaction,Message
 from app.schemas import ReactionCreate, ReactionResponse
 from app.users import fastapi_users
 
@@ -17,33 +17,34 @@ router = APIRouter(
 
 
 @router.post("/add",
-             response_model=ReactionResponse,
+             # response_model=ReactionResponse,
              status_code=status.HTTP_201_CREATED)
 async def add_reaction(user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session),
                        reaction: ReactionCreate = Depends()):
     """
-    Method to add a new picture to the database.
+    Method to add a new reaction to the database.
     :param reaction:
     :param user:
     :param session:
-    :param picture:
+    :param reaction:
     :return:
     """
     try:
-        new_reaction = Reaction(user_id=user.id,
+        new_reaction = Reaction(user_id=2,
                                 type=reaction.type,
-                                reacted_message=reaction.reacted_message),
-
+                                message_id=reaction.message_id)
         session.add(new_reaction)
+        await session.commit()
+
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    await session.commit()
-    return {"reactions": new_reaction}
+
+    return {"reaction": new_reaction}
 
 
 @router.get("/get",
-            response_model=ReactionResponse,
+            # response_model=ReactionResponse,
             status_code=status.HTTP_200_OK)
 async def get_reactions(user: User = Depends(current_user),
                         session: AsyncSession = Depends(get_async_session)):
@@ -57,7 +58,6 @@ async def get_reactions(user: User = Depends(current_user),
         statement = select(Reaction).where(Reaction.user_id == user.id)
         results = await session.execute(statement)
         instances = results.scalars().all()
-        return {"pictures": instances}
-
+        return {"reactions": instances}
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))

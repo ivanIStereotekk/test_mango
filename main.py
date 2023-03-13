@@ -56,7 +56,7 @@ app.include_router(
 # D B  Entity's Routers
 app.include_router(pictures_router, prefix="/pictures", tags=["User Pictures API"])
 app.include_router(reaction_router, prefix="/reactions", tags=["User Reaction API"])
-app.include_router(message_router, prefix="/private", tags=["User's Private Message API"])
+app.include_router(message_router, prefix="/private", tags=["Message API"])
 
 
 # OTHER ROUTERS AND ENDPOINTS
