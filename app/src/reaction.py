@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from fastapi.openapi.models import Response
+from sqlalchemy import select, delete
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
+from starlette.responses import PlainTextResponse
 
-from app.db import User, get_async_session, Reaction,Message
+from app.db import User, get_async_session, Reaction, Message
 from app.schemas import ReactionCreate, ReactionResponse
 from app.users import fastapi_users
 
@@ -17,7 +19,7 @@ router = APIRouter(
 
 
 @router.post("/add",
-             response_model=ReactionResponse,
+             # response_model=ReactionResponse,
              status_code=status.HTTP_201_CREATED)
 async def add_reaction(user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session),
@@ -58,6 +60,32 @@ async def get_reactions(user: User = Depends(current_user),
         statement = select(Reaction).where(Reaction.user_id == user.id)
         results = await session.execute(statement)
         instances = results.scalars().all()
-        return {"reactions": instances}
+
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"reactions": instances}
+
+
+@router.get("/delete/{reaction_id}",
+            status_code=status.HTTP_200_OK)
+async def delete_reactions(reaction_id: int, user: User = Depends(current_user),
+                           session: AsyncSession = Depends(get_async_session)):
+    """
+    Method to delete reaction from db.
+    :param user:
+    :param session:
+    :return: Reactions
+    """
+    try:
+        execution = await session.execute(
+            select(Reaction).where(Reaction.id == reaction_id).where(Reaction.user_id == user.id))
+        item = execution.scalars().first()
+        if item is not None:
+            await session.delete(item)
+            await session.commit()
+        else:
+            raise HTTPException(status_code=404, detail="Item not found")
+
+        return {'details': "deleted successfully"}
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))
