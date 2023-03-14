@@ -31,8 +31,9 @@ def send_prompt(gpt_prompt: str):
     proper_response = raw_response['choices'][0]['text']
     return proper_response
 
-@router.get("/do",
-            status_code=status.HTTP_200_OK)
+
+@router.post("/do",
+             status_code=status.HTTP_200_OK)
 async def make_prompt(prompt: str,
                       user: User = Depends(current_user)):
     """
@@ -48,8 +49,8 @@ async def make_prompt(prompt: str,
         raise HTTPException(status_code=400, detail="Inactive user")
 
 
-@router.get("/image",
-            status_code=status.HTTP_200_OK)
+@router.post("/image",
+             status_code=status.HTTP_200_OK)
 async def make_image(prompt: str, image_size: str,
                      user: User = Depends(current_user)):
     """
@@ -73,6 +74,7 @@ async def make_image(prompt: str, image_size: str,
 @router.get("/engines",
             status_code=status.HTTP_200_OK)
 async def list_engines(user: User = Depends(current_user)):
+    """ List all actual Open AI engines"""
     if user.is_active:
         try:
             result = show_list_models()
