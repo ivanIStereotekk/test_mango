@@ -53,7 +53,7 @@ async def make_prompt(prompt: str,
 async def make_image(prompt: str, image_size: str,
                      user: User = Depends(current_user)):
     """
-    Method to send prompt to the OpenAI ChatGPT then obtain Picture (Default value: 512x512).
+    Method to send OpenAI Prompt to Image generation (DALL·E) (Default value: 512x512).
     :param prompt:
     :param user:
     :return: answer
