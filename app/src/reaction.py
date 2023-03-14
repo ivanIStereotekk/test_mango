@@ -13,45 +13,45 @@ from app.users import fastapi_users
 current_user = fastapi_users.current_user(active=True)
 
 router = APIRouter(
-    # dependencies=[Depends(current_user)],
     responses={404: {"description": "Not found"}},
 )
 
 
 @router.post("/add",
-             # response_model=ReactionResponse,
              status_code=status.HTTP_201_CREATED)
 async def add_reaction(user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session),
                        reaction: ReactionCreate = Depends()):
-    """
-    Method to add a new reaction to the database.
-    :param reaction:
-    :param user:
-    :param session:
-    :param reaction:
-    :return:
-    """
     try:
         new_reaction = Reaction(user_id=user.id,
                                 type=reaction.type,
                                 message_id=reaction.message_id)
-        session.add(new_reaction)
-        await session.commit()
+        # C H E C K  T H E   S A M E
+        _statement = select(Reaction).where(Reaction.user_id ==
+                                            user.id).where(Reaction.message_id == reaction.message_id)
+        _results = await session.execute(_statement)
+        from_db = _results.scalars().first()
+        if from_db is None:
+            session.add(new_reaction)
+            await session.commit()
+        return {"reaction": new_reaction}
 
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    return {"reaction": new_reaction}
+
+
+
+
 
 
 @router.get("/get",
             # response_model=ReactionResponse,
             status_code=status.HTTP_200_OK)
-async def get_reactions(user: User = Depends(current_user),
-                        session: AsyncSession = Depends(get_async_session)):
+async def get_all_reactions(user: User = Depends(current_user),
+                            session: AsyncSession = Depends(get_async_session)):
     """
-    Method to get all pictures from the database.
+    Method to get all user reactions from the database.
     :param user:
     :param session:
     :return: Reactions
@@ -64,6 +64,29 @@ async def get_reactions(user: User = Depends(current_user),
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return {"reactions": instances}
+
+
+@router.get("/get_by/{message_id}",
+            # response_model=ReactionResponse,
+            status_code=status.HTTP_200_OK)
+async def get_all_reactions_message_id(message_id: int, user: User = Depends(current_user),
+                                       session: AsyncSession = Depends(get_async_session)):
+    """
+    Method to get all reactions by message id from the database.
+    :param message_id:
+    :param user:
+    :param session:
+    :return: Reactions                                          # SCHEMA NEED
+    """
+    if user.is_active:
+        try:
+            statement = select(Reaction).where(Reaction.message_id == message_id)
+            results = await session.execute(statement)
+            instances = results.scalars().all()
+
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        return {"reactions": instances}
 
 
 @router.get("/delete/{reaction_id}",

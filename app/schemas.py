@@ -60,7 +60,7 @@ class ReactionCreate(BaseModel):
     id: int = None
     user_id: int = None
     type: str
-    message_id: int | None = None
+    message_id: int
 
     class Config:
         orm_mode = True
