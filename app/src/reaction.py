@@ -33,7 +33,7 @@ async def add_reaction(user: User = Depends(current_user),
     :return:
     """
     try:
-        new_reaction = Reaction(user_id=2,
+        new_reaction = Reaction(user_id=user.id,
                                 type=reaction.type,
                                 message_id=reaction.message_id)
         session.add(new_reaction)
@@ -72,6 +72,7 @@ async def delete_reactions(reaction_id: int, user: User = Depends(current_user),
                            session: AsyncSession = Depends(get_async_session)):
     """
     Method to delete reaction from db.
+    :param reaction_id: id of item to delete
     :param user:
     :param session:
     :return: Reactions

@@ -18,6 +18,7 @@ from app.db import get_async_session
 from app.src.pictures import router as pictures_router
 from app.src.reaction import router as reaction_router
 from app.src.message import router as message_router
+from app.src.chatgpt import router as chat_gpt_router
 
 # S E N T R Y - Tracing
 sentry_sdk.init(
@@ -57,6 +58,7 @@ app.include_router(
 app.include_router(pictures_router, prefix="/pictures", tags=["User Pictures API"])
 app.include_router(reaction_router, prefix="/reactions", tags=["User Reaction API"])
 app.include_router(message_router, prefix="/private", tags=["Message API"])
+app.include_router(chat_gpt_router, prefix="/prompt", tags=["Chat GPT API - experemental only"])
 
 
 # OTHER ROUTERS AND ENDPOINTS
