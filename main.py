@@ -1,14 +1,12 @@
-from typing import List, Any, Optional
 
 import uvicorn
-from fastapi import Depends, FastAPI, APIRouter, HTTPException
-from starlette import status
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas import PictureCreate, PictureResponse
-from sqlalchemy import select
+from fastapi import Depends, FastAPI
 
-from app.db import User, create_db_and_tables, drop_db_and_tables, Picture, drop_table
+
+from app.models import User
+
+
+from app.db import create_db_and_tables, drop_db_and_tables, drop_table
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
 from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE

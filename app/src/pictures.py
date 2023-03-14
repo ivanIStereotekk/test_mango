@@ -4,10 +4,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from app.db import User, get_async_session, Picture
+from app.models import User, Picture
 from app.schemas import PictureResponse, PictureCreate
 from app.users import fastapi_users
-
+from app.db import get_async_session
 
 current_user = fastapi_users.current_user(active=True)
 

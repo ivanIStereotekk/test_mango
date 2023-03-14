@@ -4,7 +4,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from datetime import datetime
-from app.db import User, get_async_session,Message
+from app.models import User,Message
+from app.db import get_async_session
 from app.schemas import MessageResponse, MessageCreate
 from app.users import fastapi_users
 

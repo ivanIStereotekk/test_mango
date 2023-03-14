@@ -4,9 +4,9 @@ from sqlalchemy import select, delete
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-from starlette.responses import PlainTextResponse
 
-from app.db import User, get_async_session, Reaction, Message
+from app.db import get_async_session
+from app.models import User, Reaction, Message
 from app.schemas import ReactionCreate, ReactionResponse
 from app.users import fastapi_users
 

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 from starlette.responses import FileResponse
 
-from app.db import User
+from app.models import User
 from app.users import fastapi_users
 from settings import OPEN_AI_API_KEY
 
@@ -82,4 +82,3 @@ async def list_engines(user: User = Depends(current_user)):
         except BaseException as e:
             raise HTTPException(status_code=400, detail=str(e))
 
-            # image_resp = openai.Image.create(prompt="two dogs playing chess, oil painting", n=4, size="512x512")
