@@ -22,6 +22,13 @@ router = APIRouter(
 async def add_reaction(user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session),
                        reaction: ReactionCreate = Depends()):
+    """
+    Reaction add method - unique reaction
+    :param user:
+    :param session:
+    :param reaction:
+    :return: added entity
+    """
     try:
         new_reaction = Reaction(user_id=user.id,
                                 type=reaction.type,
@@ -89,12 +96,12 @@ async def get_all_reactions_message_id(message_id: int, user: User = Depends(cur
         return {"reactions": instances}
 
 
-@router.get("/delete/{reaction_id}",
+@router.delete("/delete/{reaction_id}",
             status_code=status.HTTP_200_OK)
 async def delete_reactions(reaction_id: int, user: User = Depends(current_user),
                            session: AsyncSession = Depends(get_async_session)):
     """
-    Method to delete reaction from db.
+    Method to delete reaction from db {ONLY PERSONAL}.
     :param reaction_id: id of item to delete
     :param user:
     :param session:

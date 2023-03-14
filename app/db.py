@@ -13,11 +13,9 @@ from settings import PG_HOST, PG_PORT, PG_USER, PG_PASS, PG_DB_NAME
 DATABASE_URL = f"postgresql+asyncpg://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/{PG_DB_NAME}"
 
 
-
-
-
 class Base(DeclarativeBase):
     pass
+
 
 # Association Table
 
@@ -32,7 +30,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     email: Mapped[str] = mapped_column(String, nullable=False)
     phone_number: Mapped[str] = mapped_column(String, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String, nullable=False)
-    pictures: Mapped["Picture"] = relationship(backref='user',uselist=False)
+    pictures: Mapped["Picture"] = relationship(backref='user', uselist=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=True, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
@@ -52,6 +50,7 @@ class Picture(Base):
     file_100: Mapped[str] = mapped_column(Text)
     file_400: Mapped[str] = mapped_column(Text)
     original: Mapped[str] = mapped_column(Text)
+
     # Picture.user - backref
 
     def __repr__(self):
@@ -82,12 +81,11 @@ class Message(Base):
     author_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=True)
     body: Mapped[str] = mapped_column(Text)
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
-    reactions: Mapped["Reaction"] = relationship(backref='message',lazy='joined',uselist=True)
-    chat_id: Mapped[int] = mapped_column(Integer,default=None)
+    reactions: Mapped["Reaction"] = relationship(backref='message', lazy='joined', uselist=True)
+    chat_id: Mapped[int] = mapped_column(Integer, default=None)
+
     def __repr__(self):
         return f"Message_id={self.id}, author={self.author_id}, created_at={self.chat_id}"
-
-
 
 
 engine = create_async_engine(DATABASE_URL, echo=True)
