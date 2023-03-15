@@ -53,7 +53,7 @@ async def add_reaction(user: User = Depends(current_user),
 
 
 @router.get("/get",
-            # response_model=ReactionResponse,
+            response_model=ReactionResponse,
             status_code=status.HTTP_200_OK)
 async def get_all_reactions(user: User = Depends(current_user),
                             session: AsyncSession = Depends(get_async_session)):
@@ -74,7 +74,7 @@ async def get_all_reactions(user: User = Depends(current_user),
 
 
 @router.get("/get_by/{message_id}",
-            # response_model=ReactionResponse,
+            response_model=ReactionResponse,
             status_code=status.HTTP_200_OK)
 async def get_all_reactions_message_id(message_id: int, user: User = Depends(current_user),
                                        session: AsyncSession = Depends(get_async_session)):

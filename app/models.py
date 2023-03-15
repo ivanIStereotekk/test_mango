@@ -12,7 +12,6 @@ class Base(DeclarativeBase):
     pass
 
 
-# Association Table
 
 class User(SQLAlchemyBaseUserTable[int], Base):
     """
@@ -80,4 +79,4 @@ class Message(Base):
     chat_id: Mapped[int] = mapped_column(Integer, default=None)
 
     def __repr__(self):
-        return f"Message_id={self.id}, author={self.author_id}, created_at={self.chat_id}"
+        return f"Message_id={self.id}, author={self.author_id}, chat_id={self.chat_id}"

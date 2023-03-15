@@ -71,14 +71,13 @@ class ReactionInner(BaseModel):
     user_id: int
     type: str
     message_id: int
-    reactions: list
 
     class Config:
         orm_mode = True
 
 
 class ReactionResponse(BaseModel):
-    reactions: ReactionInner
+    reactions: list[ReactionInner]
 
     class Config:
         orm_mode = True

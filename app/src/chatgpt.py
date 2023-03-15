@@ -1,7 +1,7 @@
 import openai
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, StreamingResponse
 
 from app.models import User
 from app.users import fastapi_users
@@ -26,6 +26,7 @@ def send_prompt(gpt_prompt: str):
     raw_response = openai.Completion.create(
         engine=OPEN_AI_ENGINE,
         prompt=gpt_prompt,
+        organization='EwanPotterman',
         max_tokens=256,
     )
     proper_response = raw_response['choices'][0]['text']
@@ -51,7 +52,7 @@ async def make_prompt(prompt: str,
 
 @router.post("/image",
              status_code=status.HTTP_200_OK)
-async def make_image(prompt: str, image_size: str,
+async def make_image(prompt: str | None, image_size: str,
                      user: User = Depends(current_user)):
     """
     Method to send OpenAI Prompt to Image generation (DALL·E) (Default value: 512x512).
@@ -66,7 +67,7 @@ async def make_image(prompt: str, image_size: str,
             return FileResponse(image_resp)
         else:
             image_resp = openai.Image.create(prompt=prompt, n=4, size=image_size)
-            return FileResponse(image_resp)
+            return StreamingResponse(image_resp)
     else:
         raise HTTPException(status_code=400, detail="Error")
 
