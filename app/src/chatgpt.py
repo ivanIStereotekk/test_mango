@@ -5,7 +5,7 @@ from starlette.responses import FileResponse
 
 from app.models import User
 from app.users import fastapi_users
-from settings import OPEN_AI_API_KEY
+from settings import OPEN_AI_API_KEY,OPEN_AI_ENGINE
 
 openai.api_key = OPEN_AI_API_KEY
 tried_models = ["code-cushman-001", ]
@@ -24,7 +24,7 @@ def show_list_models():
 
 def send_prompt(gpt_prompt: str):
     raw_response = openai.Completion.create(
-        engine="code-cushman-001",
+        engine=OPEN_AI_ENGINE,
         prompt=gpt_prompt,
         max_tokens=256,
     )
@@ -81,4 +81,3 @@ async def list_engines(user: User = Depends(current_user)):
             return {"engines": result}
         except BaseException as e:
             raise HTTPException(status_code=400, detail=str(e))
-
