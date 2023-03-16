@@ -4,7 +4,6 @@ from fastapi_users import schemas
 from typing import Optional
 from datetime import datetime
 
-
 # USER schemas
 
 class UserRead(schemas.BaseUser[int]):
@@ -101,3 +100,7 @@ class MessageResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class GPT_Engines(BaseModel):
+    engines: list

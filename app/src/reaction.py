@@ -1,12 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.openapi.models import Response
-from sqlalchemy import select, delete
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-
 from app.db import get_async_session
-from app.models import User, Reaction, Message
+from app.models import User, Reaction
 from app.schemas import ReactionCreate, ReactionResponse
 from app.users import fastapi_users
 
@@ -45,11 +43,6 @@ async def add_reaction(user: User = Depends(current_user),
 
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-
-
-
-
 
 
 @router.get("/get",
@@ -97,7 +90,7 @@ async def get_all_reactions_message_id(message_id: int, user: User = Depends(cur
 
 
 @router.delete("/delete/{reaction_id}",
-            status_code=status.HTTP_200_OK)
+               status_code=status.HTTP_200_OK)
 async def delete_reactions(reaction_id: int, user: User = Depends(current_user),
                            session: AsyncSession = Depends(get_async_session)):
     """

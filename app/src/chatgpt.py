@@ -4,8 +4,9 @@ from starlette import status
 from starlette.responses import FileResponse, StreamingResponse
 
 from app.models import User
+from app.schemas import GPT_Engines
 from app.users import fastapi_users
-from settings import OPEN_AI_API_KEY,OPEN_AI_ENGINE
+from settings import OPEN_AI_API_KEY, OPEN_AI_ENGINE
 
 openai.api_key = OPEN_AI_API_KEY
 tried_models = ["code-cushman-001", ]
@@ -26,8 +27,6 @@ def send_prompt(gpt_prompt: str):
     raw_response = openai.Completion.create(
         engine=OPEN_AI_ENGINE,
         prompt=gpt_prompt,
-        organization='EwanPotterman',
-        max_tokens=256,
     )
     proper_response = raw_response['choices'][0]['text']
     return proper_response
@@ -38,7 +37,7 @@ def send_prompt(gpt_prompt: str):
 async def make_prompt(prompt: str,
                       user: User = Depends(current_user)):
     """
-    Method to send prompt to the OpenAI ChatGPT.
+    Method to make prompt to the OpenAI ChatGPT.
     :param prompt:
     :param user:
     :return: answer
@@ -55,10 +54,11 @@ async def make_prompt(prompt: str,
 async def make_image(prompt: str | None, image_size: str,
                      user: User = Depends(current_user)):
     """
-    Method to send OpenAI Prompt to Image generation (DALL·E) (Default value: 512x512).
+    Method to send OpenAI Prompt to Image generation (DALL·E) .
+    :param image_size: default_value "512x512"
     :param prompt:
     :param user:
-    :return: answer
+    :return: StreamResponse
     """
     if user.is_active:
         if not image_size:
@@ -73,6 +73,7 @@ async def make_image(prompt: str | None, image_size: str,
 
 
 @router.get("/engines",
+            response_model=GPT_Engines,
             status_code=status.HTTP_200_OK)
 async def list_engines(user: User = Depends(current_user)):
     """ List all actual Open AI engines"""
