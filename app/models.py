@@ -40,7 +40,7 @@ class Picture(Base):
     __tablename__ = "picture_table"
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=False)
-    picture: Mapped[str] = mapped_column(LargeBinary,nullable=False)
+    filename: Mapped[str] = mapped_column(Text,nullable=False)
     tag: Mapped[str] = mapped_column(String)
     # Picture.user - backref
 
