@@ -57,10 +57,12 @@ async def get_pictures(picture_id: int,user: User = Depends(current_user),
         statement = select(Picture).where(Picture.id == picture_id)
         results = await session.execute(statement)
         instances = results.scalars().first()
+
         with open(f"./temp/temporary.png","wb+") as buff:
             decoded = base64.standard_b64decode(instances.picture)
             buff.write(decoded)
-            return FileResponse(buff.name,media_type="image/png")
+            # return FileResponse(buff.name,media_type="image/png")
+            return instances.picture
 
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))
