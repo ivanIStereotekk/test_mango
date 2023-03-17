@@ -90,7 +90,7 @@ async def get_all_reactions_message_id(message_id: int, user: User = Depends(cur
 
 
 @router.delete("/delete/{reaction_id}",
-               status_code=status.HTTP_200_OK)
+               status_code=status.HTTP_302_FOUND)
 async def delete_reactions(reaction_id: int, user: User = Depends(current_user),
                            session: AsyncSession = Depends(get_async_session)):
     """
@@ -108,7 +108,7 @@ async def delete_reactions(reaction_id: int, user: User = Depends(current_user),
             await session.delete(item)
             await session.commit()
         else:
-            raise HTTPException(status_code=404, detail="Item not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
 
         return {'details': "deleted successfully"}
     except SQLAlchemyError as e:

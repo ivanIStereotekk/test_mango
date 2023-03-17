@@ -1,13 +1,22 @@
+import base64
+import io
+import json
+import logging
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
+import os, sys
+from PIL import Image
+import tempfile
+from starlette.responses import FileResponse, StreamingResponse
+import shutil
 
 from app.models import User, Picture
-from app.schemas import PictureResponse, PictureCreate
 from app.users import fastapi_users
 from app.db import get_async_session
+from settings import root_dir
 
 current_user = fastapi_users.current_user(active=True)
 
@@ -15,39 +24,28 @@ router = APIRouter(
     dependencies=[Depends(current_user)],
     responses={404: {"description": "Not found"}},
 )
+
+
 @router.post("/add",
-             response_model=PictureResponse,
              status_code=status.HTTP_201_CREATED)
-async def add_picture(user: User = Depends(current_user),
-                      session: AsyncSession = Depends(get_async_session),
-                      picture: PictureCreate = Depends()):
-    """
-    Method to add a new message to the database.
-    :param user:
-    :param session:
-    :param picture:
-    :return:
-    """
-    try:
-        new_picture = Picture(user_id=user.id,
-                              file_50=picture.file_50,
-                              file_100=picture.file_100,
-                              file_400=picture.file_400,
-                              original=picture.original
-                              )
-        session.add(new_picture)
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    await session.commit()
-    return {"pictures": [
-        PictureCreate.from_orm(new_picture)
-    ]}
+async def add_picture(tag: str,picture: UploadFile = File(),
+                   user: User = Depends(current_user),
+                   session: AsyncSession = Depends(get_async_session)):
+    """ Add file and image response"""
+    with open(f"./temp/temporary.png","wb+") as buff:
+        shutil.copyfileobj(picture.file,buff)
+        string_b = base64.b64encode(buff.read())
+        new = Picture(user_id=user.id,
+                      picture=string_b,
+                      tag=tag)
+        session.add(new)
+        await session.commit()
+        return {"details":f"{status.HTTP_201_CREATED} Successfully added"}
 
 
-@router.get("/get",
-            response_model=PictureResponse,
+@router.get("/get/{picture_id}",
             status_code=status.HTTP_200_OK)
-async def get_pictures(user: User = Depends(current_user),
+async def get_pictures(picture_id: int,user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session)):
     """
     Method to get all messages from the database.
@@ -56,10 +54,26 @@ async def get_pictures(user: User = Depends(current_user),
     :return:
     """
     try:
-        statement = select(Picture).where(Picture.user_id == user.id)
+        statement = select(Picture).where(Picture.id == picture_id)
         results = await session.execute(statement)
-        instances = results.scalars().all()
-        return {"pictures": instances}
+        instances = results.scalars().first()
+        with open(f"./temp/temporary.png","wb+") as buff:
+            decoded = base64.standard_b64decode(instances.picture)
+            buff.write(decoded)
+            return FileResponse(buff.name,media_type="image/png")
 
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+#
+# with Image.open(infile) as im:
+#     im.thumbnail(size)
+#     im.save(outfile, "JPEG")
+
+
+
+
+
+
+

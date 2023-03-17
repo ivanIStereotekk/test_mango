@@ -36,3 +36,6 @@ typing_extensions==4.5.0
 urllib3==1.26.14
 uvicorn==0.20.0
 wrapt==1.15.0
+
+openai~=0.27.2
+Pillow~=9.4.0

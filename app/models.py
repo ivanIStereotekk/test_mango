@@ -1,7 +1,7 @@
 
 from fastapi_users.db import SQLAlchemyUserDatabase
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import Integer, String, ForeignKey, Text, Boolean, DateTime, Table, Column
+from sqlalchemy import Integer, String, ForeignKey, Text, Boolean, DateTime, Table, Column,LargeBinary
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped, mapped_column
 
 
@@ -40,15 +40,12 @@ class Picture(Base):
     __tablename__ = "picture_table"
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=False)
-    file_50: Mapped[str] = mapped_column(Text)
-    file_100: Mapped[str] = mapped_column(Text)
-    file_400: Mapped[str] = mapped_column(Text)
-    original: Mapped[str] = mapped_column(Text)
-
+    picture: Mapped[str] = mapped_column(LargeBinary,nullable=False)
+    tag: Mapped[str] = mapped_column(String)
     # Picture.user - backref
 
     def __repr__(self):
-        return f"Picture_id={self.id}, user={self.user_id})"
+        return f"Picture_id={self.id}, user={self.user_id} tag={self.tag})"
 
 
 class Reaction(Base):

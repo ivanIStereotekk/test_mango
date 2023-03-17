@@ -36,22 +36,22 @@ class UserUpdate(schemas.BaseUserUpdate):
 # Other Schemas
 #    ================================================================= Picture
 
-class PictureCreate(BaseModel):
-    user_id: int = None
-    file_50: str
-    file_100: str
-    file_400: str
-    original: str
-
-    class Config:
-        orm_mode = True
-
-
-class PictureResponse(BaseModel):
-    pictures: list[PictureCreate]
-
-    class Config:
-        orm_mode = True
+# class PictureCreate(BaseModel):
+#     user_id: int = None
+#     file_50: str
+#     file_100: str
+#     file_400: str
+#     original: str
+#
+#     class Config:
+#         orm_mode = True
+#
+#
+# class PictureResponse(BaseModel):
+#     pictures: list[PictureCreate]
+#
+#     class Config:
+#         orm_mode = True
 
 
 #    ================================================================= Reaction
