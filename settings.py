@@ -1,5 +1,6 @@
 from dotenv import dotenv_values
 import pathlib
+import logging
 
 # ROOT DIRECTORY OF THE PROJECT
 
@@ -25,3 +26,5 @@ SENTRY_DSN = config["SENTRY_DSN"]
 SENTRY_TRACES_SAMPLE_RATE = config["SENTRY_TRACES_SAMPLE_RATE"]
 OPEN_AI_API_KEY = config["OPEN_AI_API_KEY"]
 OPEN_AI_ENGINE = config["OPEN_AI_ENGINE"]
+
+

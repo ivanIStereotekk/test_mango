@@ -5,19 +5,13 @@ from app.models import User
 from app.models import Base
 from fastapi import Depends
 
-
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from settings import PG_HOST, PG_PORT, PG_USER, PG_PASS, PG_DB_NAME
 
-
 DATABASE_URL = f"postgresql+asyncpg://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/{PG_DB_NAME}"
 
-
-
-
-
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(DATABASE_URL, echo=False)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 
