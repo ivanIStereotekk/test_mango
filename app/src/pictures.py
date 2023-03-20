@@ -27,7 +27,6 @@ router = APIRouter(
 )
 
 
-
 @router.post("/add",
              status_code=status.HTTP_201_CREATED)
 async def add_picture(tag: str, picture: UploadFile = File(),
@@ -71,10 +70,12 @@ async def get_pictures(picture_id: int, user: User = Depends(current_user),
     except SQLAlchemyError as e:
         logging.error(f"SQLAlchemyError: >> {e} \n {get_pictures.__name__}")
         raise HTTPException(status_code=400, detail=str(e))
-@router.post("/get_size",
+
+
+@router.post("/get_resized",
              status_code=status.HTTP_200_OK)
-async def get_by_size_and_id(picture_id:int,size_h:int, size_v:int,user: User = Depends(current_user),
-                         session: AsyncSession = Depends(get_async_session)):
+async def get_by_size_and_id(picture_id: int, size_h: int, size_v: int, user: User = Depends(current_user),
+                             session: AsyncSession = Depends(get_async_session)):
     """ Method which returns resized picture"""
     try:
         statement = select(Picture).where(Picture.id == picture_id)
@@ -117,5 +118,3 @@ async def delete_picture(picture_id: int, user: User = Depends(current_user),
     except SQLAlchemyError as e:
         logging.error(f"SQLAlchemyError: >> {e} \n {delete_picture.__name__}")
         raise HTTPException(status_code=400, detail=str(e))
-
-
