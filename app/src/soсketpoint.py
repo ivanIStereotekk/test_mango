@@ -66,13 +66,13 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@router.get("/web_test_socket")
+@router.get("/web")
 async def get():
     return HTMLResponse(html)
 
 
 @router.websocket("/chat/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
+async def websocket_endpoint(websocket: WebSocket, client_id: str):
     await manager.connect(websocket)
     try:
         while True:

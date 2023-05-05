@@ -58,7 +58,7 @@ app.include_router(pictures_router, prefix="/pictures", tags=["User Pictures API
 app.include_router(reaction_router, prefix="/reactions", tags=["User Reaction API"])
 app.include_router(message_router, prefix="/private", tags=["Message API"])
 app.include_router(chat_gpt_router, prefix="/prompt", tags=["Chat GPT API"])
-app.include_router(socket_router, prefix="/wsocket", tags=["Web Socket API"])
+app.include_router(socket_router, prefix="/socket", tags=["Web Socket API"])
 
 
 # OTHER ROUTERS AND ENDPOINTS
