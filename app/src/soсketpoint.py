@@ -14,7 +14,7 @@ html = """
     </head>
     <body>
         <h1>WebSocket Chat</h1>
-        <h2>Your ID: <span id="ws-id"></span></h2>
+        <h2>Chat ID: <span id="ws-id"></span></h2>
         <form action="" onsubmit="sendMessage(event)">
             <input type="text" id="messageText" autocomplete="off"/>
             <button>Send</button>
@@ -22,9 +22,9 @@ html = """
         <ul id='messages'>
         </ul>
         <script>
-            var client_id = Date.now()
-            document.querySelector("#ws-id").textContent = client_id;
-            var ws = new WebSocket(`ws://localhost:8000/ws/${client_id}`);
+            var chat_id = Date.now()
+            document.querySelector("#ws-id").textContent = chat_id;
+            var ws = new WebSocket(`ws://localhost:8000/socket/chat/${chat_id}`);
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
@@ -71,15 +71,15 @@ async def get():
     return HTMLResponse(html)
 
 
-@router.websocket("/chat/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: str):
+@router.websocket("/chat/{chat_id}")
+async def websocket_endpoint(websocket: WebSocket, chat_id: str):
     await manager.connect(websocket)
     try:
         while True:
             data = await websocket.receive_text()
             print(data)
             await manager.send_personal_message(f"You wrote: {data}", websocket)
-            await manager.broadcast(f"Client #{client_id} says: {data}")
+            await manager.broadcast(f"Client #{chat_id} says: {data}")
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-        await manager.broadcast(f"Client #{client_id} left the chat")
+        await manager.broadcast(f"Client #{chat_id} left the chat")
