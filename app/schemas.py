@@ -3,12 +3,20 @@ from pydantic.types import constr
 from fastapi_users import schemas
 from typing import Optional
 from datetime import datetime
+from pydantic import BaseModel, EmailStr
 
 # USER schemas
+
+
+
+class UserLogin(schemas.BaseUserCreate):
+    email: EmailStr
+    password: str
 
 class UserRead(schemas.BaseUser[int]):
     name: str
     surname: str
+    email: str
     phone_number: str
     is_active: bool
     is_superuser: bool
@@ -17,6 +25,7 @@ class UserRead(schemas.BaseUser[int]):
 
 class UserCreate(schemas.BaseUserCreate):
     name: str
+    email: EmailStr
     surname: str
     phone_number: constr(strip_whitespace=True, min_length=8, max_length=15, regex="^\\+?[1-9][0-9]{7,14}$")
     is_active: bool = Field(default=True)

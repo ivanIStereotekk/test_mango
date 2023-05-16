@@ -7,7 +7,7 @@ from app.models import User
 
 
 from app.db import create_db_and_tables, drop_db_and_tables, drop_table
-from app.schemas import UserCreate, UserRead, UserUpdate
+from app.schemas import UserCreate, UserRead, UserUpdate, UserLogin
 from app.users import auth_backend, current_active_user, fastapi_users
 from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
 import sentry_sdk
@@ -30,8 +30,10 @@ app = FastAPI(title="Messanger Mango Project", version="0.1.0")
 
 # AUTHENTICATION ROUTERS
 
+
+# CHANGED vs UserLogin
 app.include_router(
-    fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["Authentication Token Methods"]
+    fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["Login / Logout Methods"]
 )
 app.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
