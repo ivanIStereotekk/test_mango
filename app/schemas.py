@@ -9,9 +9,7 @@ from pydantic import BaseModel, EmailStr
 
 
 
-class UserLogin(schemas.BaseUserCreate):
-    email: EmailStr
-    password: str
+
 
 class UserRead(schemas.BaseUser[int]):
     name: str
