@@ -77,3 +77,9 @@ class Message(Base):
 
     def __repr__(self):
         return f"Message_id={self.id}, author={self.author_id}, chat_id={self.chat_id}"
+
+
+
+class ContactList(Base):
+    "Продумай Контакт Лист и Методы ..."
+    pass

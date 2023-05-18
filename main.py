@@ -7,7 +7,7 @@ from app.models import User
 
 
 from app.db import create_db_and_tables, drop_db_and_tables, drop_table
-from app.schemas import UserCreate, UserRead, UserUpdate, UserLogin
+from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
 from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
 import sentry_sdk
