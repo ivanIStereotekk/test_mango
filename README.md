@@ -1,4 +1,4 @@
-#Mango App
+Messenger Mango Project
 Бекенд web server приложение для социальной сети [ месенджера ]. 
 
 Стек технологий:
