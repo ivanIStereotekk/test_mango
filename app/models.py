@@ -80,6 +80,7 @@ class Message(Base):
 
 
 
-class ContactList(Base):
-    "Продумай Контакт Лист и Методы ..."
-    pass
+# class ContactList(Base):
+#     "Продумай Контакт Лист и Методы ..."
+#     __tablename__ = 'contact_table'
+#     id: Mapped[int] = mapped_column(primary_key=True)
