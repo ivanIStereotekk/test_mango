@@ -1,6 +1,6 @@
 from dotenv import dotenv_values
 import pathlib
-import logging
+
 # ROOT DIRECTORY OF THE PROJECT
 root_dir = pathlib.Path(__file__).parent.resolve()
 
