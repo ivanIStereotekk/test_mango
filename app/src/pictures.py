@@ -51,7 +51,7 @@ async def add_picture(tag: str, picture: UploadFile = File(),
 
 @router.get("/get/{picture_id}",
             status_code=status.HTTP_200_OK)
-async def get_pictures(picture_id: int, user: User = Depends(current_user),
+async def get_pictures(picture_id: int,
                        session: AsyncSession = Depends(get_async_session)):
     """
     Method to get all messages from the database.
@@ -74,7 +74,7 @@ async def get_pictures(picture_id: int, user: User = Depends(current_user),
 
 @router.post("/get_resized",
              status_code=status.HTTP_200_OK)
-async def get_by_size_and_id(picture_id: int, size_h: int, size_v: int, user: User = Depends(current_user),
+async def get_by_size_and_id(picture_id: int, size_h: int, size_v: int,
                              session: AsyncSession = Depends(get_async_session)):
     """ Method which returns resized picture"""
     try:
@@ -96,10 +96,11 @@ async def get_by_size_and_id(picture_id: int, size_h: int, size_v: int, user: Us
 
 @router.delete("/delete/{picture_id}",
                status_code=status.HTTP_200_OK)
-async def delete_picture(picture_id: int, user: User = Depends(current_user),
+async def delete_picture(picture_id: int,
                          session: AsyncSession = Depends(get_async_session)):
     """
     Method to get all messages from the database.
+    :param picture_id:
     :param user:
     :param session:
     :return:

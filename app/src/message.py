@@ -42,7 +42,7 @@ async def add_message(user: User = Depends(current_user),
 @router.get("/get",
             response_model=MessageResponse,
             status_code=status.HTTP_200_OK)
-@cache(expire=REDIS_CACHING_HOUR)
+@cache(expire=REDIS_CACHING_HOUR,namespace='messages_cache_hour')
 async def get_current_user_messages(user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session)):
     try:
@@ -58,7 +58,7 @@ async def get_current_user_messages(user: User = Depends(current_user),
 @router.get("/get/{chat_id}",
             response_model=MessageResponse,
             status_code=status.HTTP_200_OK)
-@cache(expire=REDIS_CACHING_HOUR)
+@cache(expire=REDIS_CACHING_HOUR,namespace='messages_cache_hour')
 async def get_messages_by_chat_id(chat_id: int,user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session)):
     if user:
