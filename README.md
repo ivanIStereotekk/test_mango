@@ -14,6 +14,7 @@ Messenger Mango Project [ На текущий момент в разработк
 -  Chat GPT [Open AI]
 -  Open API
 -  Swagger
+-  REDIS CACHE [fastapi-cache2]
 
 
 
