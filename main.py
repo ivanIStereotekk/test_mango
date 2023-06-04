@@ -1,15 +1,13 @@
 
 import uvicorn
 from fastapi import Depends, FastAPI
-
-
 from app.models import User
 from app.db import create_db_and_tables, drop_db_and_tables, drop_table
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
 from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
 import sentry_sdk
-from app.db import get_async_session
+
 # R O U T E R S
 from app.src.pictures import router as pictures_router
 from app.src.reaction import router as reaction_router
@@ -101,8 +99,6 @@ def get_current_user(user: User = Depends(current_user)):
 async def startup():
     redis = aioredis.from_url("redis://localhost")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-
-
 
 
 if __name__ == "__main__":

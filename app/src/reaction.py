@@ -9,6 +9,7 @@ from app.schemas import ReactionCreate, ReactionResponse
 from app.users import fastapi_users
 from fastapi_cache.decorator import cache
 from settings import REDIS_CACHING_MIN
+
 current_user = fastapi_users.current_user(active=True)
 
 router = APIRouter(

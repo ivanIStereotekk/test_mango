@@ -9,9 +9,11 @@ from app.db import get_async_session
 from app.schemas import MessageResponse, MessageCreate
 from app.users import fastapi_users
 from fastapi_cache.decorator import cache
-from settings import  REDIS_CACHING_HOUR
+from settings import REDIS_CACHING_HOUR
 
 current_user = fastapi_users.current_user(active=True)
+
+
 
 router = APIRouter(
     responses={404: {"description": "Not found"}},
@@ -68,3 +70,5 @@ async def get_messages_by_chat_id(chat_id: int,user: User = Depends(current_user
 
         except SQLAlchemyError as e:
             raise HTTPException(status_code=400, detail=str(e))
+
+
