@@ -1,6 +1,4 @@
 import logging
-import tempfile
-
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
