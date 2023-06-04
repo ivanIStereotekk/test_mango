@@ -1,4 +1,4 @@
-Messenger Mango Project (Not complited version, still in development}
+Messenger Mango Project [ На текущий момент в разработке ] 
 Бекенд web server приложение для социальной сети [ месенджера ]. 
 
 Стек технологий:
