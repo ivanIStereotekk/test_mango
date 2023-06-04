@@ -4,8 +4,6 @@ from fastapi import Depends, FastAPI
 
 
 from app.models import User
-
-
 from app.db import create_db_and_tables, drop_db_and_tables, drop_table
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
@@ -18,6 +16,14 @@ from app.src.reaction import router as reaction_router
 from app.src.message import router as message_router
 from app.src.chatgpt import router as chat_gpt_router
 from app.src.soсketpoint import router as socket_router
+
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.decorator import cache
+
+from redis import asyncio as aioredis
+
+
 
 # S E N T R Y - Tracing
 sentry_sdk.init(
@@ -90,6 +96,13 @@ def get_current_user(user: User = Depends(current_user)):
 # @app.on_event("startup")
 # async def on_startup():
 #     await create_db_and_tables()
+
+@app.on_event("startup")
+async def startup():
+    redis = aioredis.from_url("redis://localhost")
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+
+
 
 
 if __name__ == "__main__":

@@ -7,7 +7,8 @@ from app.db import get_async_session
 from app.models import User, Reaction
 from app.schemas import ReactionCreate, ReactionResponse
 from app.users import fastapi_users
-
+from fastapi_cache.decorator import cache
+from settings import REDIS_CACHING_MIN
 current_user = fastapi_users.current_user(active=True)
 
 router = APIRouter(
@@ -48,6 +49,7 @@ async def add_reaction(user: User = Depends(current_user),
 @router.get("/get",
             response_model=ReactionResponse,
             status_code=status.HTTP_200_OK)
+@cache(expire=REDIS_CACHING_MIN)
 async def get_all_reactions(user: User = Depends(current_user),
                             session: AsyncSession = Depends(get_async_session)):
     """
@@ -69,6 +71,7 @@ async def get_all_reactions(user: User = Depends(current_user),
 @router.get("/get_by/{message_id}",
             response_model=ReactionResponse,
             status_code=status.HTTP_200_OK)
+@cache(expire=REDIS_CACHING_MIN)
 async def get_all_reactions_message_id(message_id: int, user: User = Depends(current_user),
                                        session: AsyncSession = Depends(get_async_session)):
     """

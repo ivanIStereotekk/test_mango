@@ -8,6 +8,8 @@ from app.models import User,Message
 from app.db import get_async_session
 from app.schemas import MessageResponse, MessageCreate
 from app.users import fastapi_users
+from fastapi_cache.decorator import cache
+from settings import  REDIS_CACHING_HOUR
 
 current_user = fastapi_users.current_user(active=True)
 
@@ -38,6 +40,7 @@ async def add_message(user: User = Depends(current_user),
 @router.get("/get",
             response_model=MessageResponse,
             status_code=status.HTTP_200_OK)
+@cache(expire=REDIS_CACHING_HOUR)
 async def get_current_user_messages(user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session)):
     try:
@@ -53,6 +56,7 @@ async def get_current_user_messages(user: User = Depends(current_user),
 @router.get("/get/{chat_id}",
             response_model=MessageResponse,
             status_code=status.HTTP_200_OK)
+@cache(expire=REDIS_CACHING_HOUR)
 async def get_messages_by_chat_id(chat_id: int,user: User = Depends(current_user),
                        session: AsyncSession = Depends(get_async_session)):
     if user:
