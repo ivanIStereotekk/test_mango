@@ -84,3 +84,16 @@ class Message(Base):
 #     "Продумай Контакт Лист и Методы ..."
 #     __tablename__ = 'contact_table'
 #     id: Mapped[int] = mapped_column(primary_key=True)
+
+class Equipement(Base):
+    """Equipment - item table which contains artists any kind of studio gear"""
+    __tablename__ = "equipment_table"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    brand: Mapped[str] = mapped_column(Text)
+    model: Mapped[str] = mapped_column(Text)
+    gear_type: Mapped[str] = mapped_column(Text)
+    prod_year: Mapped[str] = mapped_column(Text)
+    characteristics: Mapped[str] = mapped_column(Text)
+
+    def __repr__(self):
+        return f"Equipment_id={self.id}, brand={self.brand}, model={self.model}, type={self.gear_type}"

@@ -9,11 +9,11 @@ from settings import SENTRY_DSN, SENTRY_TRACES_SAMPLE_RATE
 import sentry_sdk
 
 # R O U T E R S
-from app.src.pictures import router as pictures_router
-from app.src.reaction import router as reaction_router
-from app.src.message import router as message_router
-from app.src.chatgpt import router as chat_gpt_router
-from app.src.soсketpoint import router as socket_router
+from app.src_routers.pictures import router as pictures_router
+from app.src_routers.reaction import router as reaction_router
+from app.src_routers.message import router as message_router
+from app.src_routers.chatgpt import router as chat_gpt_router
+from app.src_routers.soсketpoint import router as socket_router
 
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
