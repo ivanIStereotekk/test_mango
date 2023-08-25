@@ -97,3 +97,22 @@ class Equipement(Base):
 
     def __repr__(self):
         return f"Equipment_id={self.id}, brand={self.brand}, model={self.model}, type={self.gear_type}"
+
+
+
+
+class Release(Base):
+    """Release - table which contains artists album """
+    __tablename__ = "release_table"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(Text)
+    artist: Mapped[str] = mapped_column(Text)
+    genre: Mapped[str] = mapped_column(Text)
+    release_date: Mapped[str] = mapped_column(Text)
+    story_text: Mapped[str] = mapped_column(Text)
+    record_label: Mapped[str] = mapped_column(Text)
+    filename: Mapped[str] = mapped_column(Text, nullable=False)
+    cover_id: Mapped[int] = mapped_column(Integer)
+
+    def __repr__(self):
+        return f"release_id={self.id}, name={self.name}, artist={self.artist}, release_date={self.release_date}"

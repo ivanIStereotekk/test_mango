@@ -88,7 +88,7 @@ async def drop_route(command: str):
 
 @app.get("/current_user", tags=["Get Current user Method"])
 def get_current_user(user: User = Depends(current_user)):
-    return f"Hello, {user.id} email ={user.email} phone={user.phone_number}"
+    return {"user_id":user.id, "name":user.name, "surname":user.surname, "email": user.email, "phone":user.phone_number}
 
 
 # @app.on_event("startup")

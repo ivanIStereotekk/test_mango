@@ -4,6 +4,7 @@ from fastapi_users import schemas
 from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
+from datetime import date, datetime, time, timedelta
 
 # USER schemas
 
@@ -41,24 +42,21 @@ class UserUpdate(schemas.BaseUserUpdate):
 
 
 # Other Schemas
-#    ================================================================= Picture
+class ReleaseCreate(BaseModel):
+    id: int = None
+    name: str = None
+    artist: str = None
+    genre: str = None
+    release_date: datetime = None
+    story_text: str = None
+    record_label: str = None
+    filename: str = None
+    cover_id: int = None
+    class Config:
+        orm_mode = True
 
-# class PictureCreate(BaseModel):
-#     user_id: int = None
-#     file_50: str
-#     file_100: str
-#     file_400: str
-#     original: str
-#
-#     class Config:
-#         orm_mode = True
-#
-#
-# class PictureResponse(BaseModel):
-#     pictures: list[PictureCreate]
-#
-#     class Config:
-#         orm_mode = True
+
+
 
 
 #    ================================================================= Reaction
