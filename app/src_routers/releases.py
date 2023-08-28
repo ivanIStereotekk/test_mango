@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-
+from datetime import datetime as dt
 from app.models import User, Release
 from app.schemas import ReleaseCreate
 from app.users import fastapi_users
@@ -27,12 +27,12 @@ router = APIRouter(
 async def add_release(release: ReleaseCreate,
                       session: AsyncSession = Depends(get_async_session)):
     """ Add release method"""
-
+    now = dt.now()
     try:
         new_release = Release(name=release.name,
                               artist=release.artist,
                               genre=release.genre,
-                              release_date=release.release_date,
+                              release_date=str(now),
                               story_text=release.story_text,
                               record_label=release.record_label,
                               filename=release.filename,
@@ -42,7 +42,7 @@ async def add_release(release: ReleaseCreate,
     except SQLAlchemyError as e:
         logging.error(f"SQLAlchemyError: >> {e} \n {add_release.__name__}")
         raise HTTPException(status_code=400, detail=str(e))
-    logging.info(f"Added release by {current_user.id} >> {release.name}")
+    logging.info(f"Added release >> {release.name}")
     return {"details": f"{status.HTTP_201_CREATED, release.name} Successfully added"}
 
 
@@ -69,7 +69,7 @@ async def get_release_id(release_id: int,
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/get/{release_name}",
+@router.get("/get_by_name/",
             status_code=status.HTTP_200_OK)
 async def get_release_name(release_name: str,
                            session: AsyncSession = Depends(get_async_session)):

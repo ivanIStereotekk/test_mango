@@ -1,1 +1,8 @@
 
+ERROR:root:SQLAlchemyError: >> (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $4: datetime.datetime(2023, 8, 28, 21, 49, 3... (expected str, got datetime)
+[SQL: INSERT INTO release_table (name, artist, genre, release_date, story_text, record_label, filename, cover_id) VALUES ($1::VARCHAR, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR, $7::VARCHAR, $8::INTEGER) RETURNING release_table.id]
+[parameters: ('Tomorrows Harviest', 'Boards Of Canada', 'IDM', datetime.datetime(2023, 8, 28, 21, 49, 32, 657000, tzinfo=datetime.timezone.utc), 'One of the best electronic music albums that was created in Warp Records', 'Warp Records', 'none of file', 0)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi) 
+ add_release
+INFO:root:Added release >> Tomorrows Harviest
+INFO:root:Added release >> Digital maintenance
