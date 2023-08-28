@@ -11,6 +11,7 @@ import sentry_sdk
 # R O U T E R S
 from app.src_routers.pictures import router as pictures_router
 from app.src_routers.reaction import router as reaction_router
+from app.src_routers.releases import router as release_router
 from app.src_routers.message import router as message_router
 from app.src_routers.chatgpt import router as chat_gpt_router
 from app.src_routers.soсketpoint import router as socket_router
@@ -62,6 +63,7 @@ app.include_router(
 # D B  Entity's Routers
 app.include_router(pictures_router, prefix="/pictures", tags=["User Pictures API"])
 app.include_router(reaction_router, prefix="/reactions", tags=["User Reaction API"])
+app.include_router(release_router, prefix="/releases", tags=["Artist Releases  API"])
 app.include_router(message_router, prefix="/private", tags=["Message API"])
 app.include_router(chat_gpt_router, prefix="/prompt", tags=["Chat GPT API"])
 app.include_router(socket_router, prefix="/socket", tags=["Web Socket API"])
