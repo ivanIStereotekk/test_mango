@@ -31,7 +31,7 @@ sentry_sdk.init(
     instrumenter=None,
 )
 
-app = FastAPI(title="Messanger Mango Project", version="0.1.0")
+app = FastAPI(title="Hexrec backend", version="0.1.0")
 
 # AUTHENTICATION ROUTERS
 
