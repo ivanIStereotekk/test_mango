@@ -1,5 +1,5 @@
 
-D U L A R  - [ preliminary name ]
+Hexrec  - [ Record label & music sharing place ]
 Бекенд web server приложение для социальной сети музыкантов и артистов  [ есть на борту месенджер ]. 
 
 Стек технологий:
