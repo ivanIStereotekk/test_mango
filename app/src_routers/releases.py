@@ -93,9 +93,41 @@ async def get_release_name(release_name: str,
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@router.get("/get_all",
+            status_code=status.HTTP_200_OK)
+async def get_release_all(session: AsyncSession = Depends(get_async_session)):
+    """
+    Method to get all releases.
+    :param session:
+    :return:
+    """
+    try:
+        statement = select(Release)
+        results = await session.execute(statement)
+        instances = results.scalars().all()
+        if instances:
+            return instances
+        else:
+            return {"details": f"{status.HTTP_404_NOT_FOUND} NOT FOUND"}
+    except SQLAlchemyError as e:
+        logging.error(f"SQLAlchemyError: >> {e} \n {get_release_name.__name__}")
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+
+
+
+
+
+
+
+
+
+
+
 @router.delete("/delete/{release_id}",
                status_code=status.HTTP_200_OK)
-async def delete_picture(release_id: int,
+async def delete_release(release_id: int,
                          session: AsyncSession = Depends(get_async_session)):
     """
     Method to find so delete release by id.
@@ -116,5 +148,5 @@ async def delete_picture(release_id: int,
             return {"details": f"{status.HTTP_404_NOT_FOUND} Not found"}
 
     except SQLAlchemyError as e:
-        logging.error(f"SQLAlchemyError: >> {e} \n {delete_picture.__name__}")
+        logging.error(f"SQLAlchemyError: >> {e} \n {delete_release.__name__}")
         raise HTTPException(status_code=400, detail=str(e))
