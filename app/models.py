@@ -89,6 +89,7 @@ class Equipement(Base):
     """Equipment - item table which contains artists any kind of studio gear"""
     __tablename__ = "equipment_table"
     id: Mapped[int] = mapped_column(primary_key=True)
+    author_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=True)
     brand: Mapped[str] = mapped_column(Text)
     model: Mapped[str] = mapped_column(Text)
     gear_type: Mapped[str] = mapped_column(Text)
@@ -105,6 +106,7 @@ class Release(Base):
     """Release - table which contains artists album """
     __tablename__ = "release_table"
     id: Mapped[int] = mapped_column(primary_key=True)
+    author_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=True)
     name: Mapped[str] = mapped_column(Text)
     artist: Mapped[str] = mapped_column(Text)
     genre: Mapped[str] = mapped_column(Text)

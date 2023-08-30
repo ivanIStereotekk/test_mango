@@ -6,3 +6,6 @@ ERROR:root:SQLAlchemyError: >> (sqlalchemy.dialects.postgresql.asyncpg.Error) <c
  add_release
 INFO:root:Added release >> Tomorrows Harviest
 INFO:root:Added release >> Digital maintenance
+INFO:root:Added picture by ivan@example.com >> 2.jpg
+INFO:root:Added release >> Tommorows Harviest by 1
+INFO:root:Added release >> Selected Ambient Works by 1

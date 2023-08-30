@@ -20,7 +20,7 @@ logging.basicConfig(filename=f'{root_dir}/logs/picture_logger.log', encoding='ut
 current_user = fastapi_users.current_user(active=True)
 
 router = APIRouter(
-    dependencies=[Depends(current_user)],
+    # dependencies=[Depends(current_user)],   -  open method without jwt token
     responses={404: {"description": "Not found"}},
 )
 

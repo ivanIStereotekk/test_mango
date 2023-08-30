@@ -44,6 +44,7 @@ class UserUpdate(schemas.BaseUserUpdate):
 # Other Schemas
 class ReleaseCreate(BaseModel):
     id: int = None
+    author_id: int = None
     name: str = None
     artist: str = None
     genre: str = None

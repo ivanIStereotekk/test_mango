@@ -17,19 +17,21 @@ logging.basicConfig(filename=f'{root_dir}/logs/release_logger.log', encoding='ut
 current_user = fastapi_users.current_user(active=True)
 
 router = APIRouter(
-    dependencies=[Depends(current_user)],
+    # dependencies=[Depends(current_user)],     -   open method to get releases
     responses={404: {"description": "Not found"}},
 )
 
 
 @router.post("/add",
-             status_code=status.HTTP_201_CREATED)
+             status_code=status.HTTP_201_CREATED,response_model_exclude_unset=True)
 async def add_release(release: ReleaseCreate,
+                      user: User = Depends(current_user),
                       session: AsyncSession = Depends(get_async_session)):
     """ Add release method"""
     now = dt.now()
     try:
         new_release = Release(name=release.name,
+                              author_id=user.id,
                               artist=release.artist,
                               genre=release.genre,
                               release_date=str(now),
@@ -42,7 +44,7 @@ async def add_release(release: ReleaseCreate,
     except SQLAlchemyError as e:
         logging.error(f"SQLAlchemyError: >> {e} \n {add_release.__name__}")
         raise HTTPException(status_code=400, detail=str(e))
-    logging.info(f"Added release >> {release.name}")
+    logging.info(f"Added release >> {release.name} by {user.id}")
     return {"details": f"{status.HTTP_201_CREATED, release.name} Successfully added"}
 
 
