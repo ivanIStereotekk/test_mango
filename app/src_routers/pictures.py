@@ -63,6 +63,7 @@ async def get_pictures(picture_id: int,
         instance = results.scalars().first()
         if instance:
             return FileResponse(str(instance.filename), media_type="image/png")
+            # return str("file:///Users/ewan/Desktop/dev/test_mango/static" + instance.filename.replace('.', ''))
         else:
             return {"details": f"{status.HTTP_404_NOT_FOUND} NOT FOUND"}
     except SQLAlchemyError as e:

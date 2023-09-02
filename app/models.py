@@ -1,3 +1,4 @@
+from typing import List
 
 from fastapi_users.db import SQLAlchemyUserDatabase
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
@@ -31,6 +32,8 @@ class User(SQLAlchemyBaseUserTable[int], Base):
 
     def __repr__(self):
         return f"User= {self.name} {self.surname} "
+
+
 
 
 class Picture(Base):
@@ -102,13 +105,29 @@ class Equipement(Base):
 
 
 
+class Artist(Base):
+    """
+    Artist or musical group model .
+    """
+    __tablename__ = "artist_table"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    author_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=False)
+    alias: Mapped[str] = mapped_column(Text,nullable=False)
+    biography: Mapped[str] = mapped_column(String)
+    participants: Mapped[List[str]] = mapped_column(String)
+    releases: Mapped[List[str]] = mapped_column(String)
+
+    def __repr__(self):
+        return f"Artist_id={self.id}, author={self.author_id} alias={self.alias})"
+
+
 class Release(Base):
     """Release - table which contains artists album """
     __tablename__ = "release_table"
     id: Mapped[int] = mapped_column(primary_key=True)
     author_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=True)
     name: Mapped[str] = mapped_column(Text)
-    artist: Mapped[str] = mapped_column(Text)
+    artists: Mapped[List[str]] = mapped_column(String)
     genre: Mapped[str] = mapped_column(Text)
     release_date: Mapped[str] = mapped_column(Text)
     story_text: Mapped[str] = mapped_column(Text)
@@ -117,4 +136,4 @@ class Release(Base):
     cover_id: Mapped[int] = mapped_column(Integer)
 
     def __repr__(self):
-        return f"release_id={self.id}, name={self.name}, artist={self.artist}, release_date={self.release_date}"
+        return f"release_id={self.id}, name={self.name}, artists={self.artists}, release_date={self.release_date}"
