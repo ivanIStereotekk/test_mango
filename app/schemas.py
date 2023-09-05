@@ -46,7 +46,7 @@ class ReleaseCreate(BaseModel):
     id: int = None
     author_id: int = None
     name: str = None
-    artist: str = None
+    artists: str = None
     genre: str = None
     release_date: datetime = None
     story_text: str = None

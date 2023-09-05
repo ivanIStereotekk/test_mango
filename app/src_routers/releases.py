@@ -32,7 +32,7 @@ async def add_release(release: ReleaseCreate,
     try:
         new_release = Release(name=release.name,
                               author_id=user.id,
-                              artist=release.artist,
+                              artists=release.artists,
                               genre=release.genre,
                               release_date=str(now),
                               story_text=release.story_text,
